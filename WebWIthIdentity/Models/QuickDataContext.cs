@@ -106,7 +106,6 @@ namespace ApiServerV1
 
         public bool Disabled { get; set; }
 
-        public bool Disabled2 { get; set; }
 
     }
 
