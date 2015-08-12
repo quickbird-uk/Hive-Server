@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Validation;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -327,17 +330,74 @@ namespace WebWIthIdentity.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email};
-
-            IdentityResult result = await UserManager.CreateAsync(user, model.Password);
-
-            if (!result.Succeeded)
+            if (model == null)
             {
-                return GetErrorResult(result);
+                return BadRequest("You sent no data");
             }
+            else
+            {
+                string suppliedEmail = model.Email ?? String.Empty; //eliminate possibility of email being null, and crashing the programm
+                string realName = model.RealName ?? string.Empty; 
+                string intUserName = model.Email ?? model.Phone.ToString(); 
+                
 
-            return Ok();
+                if (model.Phone != 0 && ! await IsPhoneUnique(UserManager, model.Phone)) 
+                //if user with such phone number exists
+                {
+                    return BadRequest("User with this PhoneNumber already exists");
+                }
+                else if (! String.IsNullOrWhiteSpace(model.Email) && ! await IsEmailUnique(UserManager, suppliedEmail))
+                //Check if email is unique
+                {
+                    return BadRequest("User with this email already exists");
+                }
+                else
+                //Everything is good, create user
+                {
+                    var user = new ApplicationUser()
+                    {
+                        Email = suppliedEmail,
+                        PhoneNumber = model.Phone,
+                        RealName = realName
+                    }; //create user
+
+                    user.UserName = user.Id;
+                    IdentityResult result; 
+
+                    try
+                    {
+                        // Your code...
+                        // Could also be before try if you know the exception occurs in SaveChanges
+
+                        result = await UserManager.CreateAsync(user, model.Password);
+                    }
+                    catch (DbEntityValidationException e)
+                    {
+                        foreach (var eve in e.EntityValidationErrors)
+                        {
+                            Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                                eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                            foreach (var ve in eve.ValidationErrors)
+                            {
+                                Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                                    ve.PropertyName, ve.ErrorMessage);
+                            }
+                        }
+                        throw;
+                    }
+
+                    
+
+                    if (!result.Succeeded)
+                    {
+                        return GetErrorResult(result);
+                    }
+
+                    return Ok();
+                }
+
+            }
+            
         }
 
         // POST api/Account/RegisterExternal
@@ -385,6 +445,28 @@ namespace WebWIthIdentity.Controllers
         }
 
         #region Helpers
+
+
+        private static async Task<bool> IsEmailUnique(ApplicationUserManager userManager, string email)
+        {
+            var list = await userManager.Users.Where(p => p.Email.Equals(email)).ToListAsync();
+            
+            if (list.Count == 0)
+            {   return true;}
+            else
+            {   return false;}
+        }
+
+        private static async Task<bool> IsPhoneUnique(ApplicationUserManager userManager, long phone)
+        {
+            var list = await userManager.Users.Where(p => p.PhoneNumber == phone).ToListAsync();
+
+            if (list.Count == 0)
+            { return true; }
+            else
+            { return false; }
+        }
+
 
         private IAuthenticationManager Authentication
         {
@@ -467,6 +549,10 @@ namespace WebWIthIdentity.Controllers
                 };
             }
         }
+
+
+        
+
 
         private static class RandomOAuthStateGenerator
         {

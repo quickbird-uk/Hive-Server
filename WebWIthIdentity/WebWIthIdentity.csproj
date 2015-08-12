@@ -223,6 +223,26 @@
     <Compile Include="Migrations\201508101801527_Checking in the field update.Designer.cs">
       <DependentUpon>201508101801527_Checking in the field update.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201508112038002_CHangedUserModel.cs" />
+    <Compile Include="Migrations\201508112038002_CHangedUserModel.Designer.cs">
+      <DependentUpon>201508112038002_CHangedUserModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508121110318_MadeIndexesNotUnique.cs" />
+    <Compile Include="Migrations\201508121110318_MadeIndexesNotUnique.Designer.cs">
+      <DependentUpon>201508121110318_MadeIndexesNotUnique.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508121115567_overrode username.cs" />
+    <Compile Include="Migrations\201508121115567_overrode username.Designer.cs">
+      <DependentUpon>201508121115567_overrode username.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508121355367_Left Username Alone.cs" />
+    <Compile Include="Migrations\201508121355367_Left Username Alone.Designer.cs">
+      <DependentUpon>201508121355367_Left Username Alone.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201508121537394_Left Email Alone.cs" />
+    <Compile Include="Migrations\201508121537394_Left Email Alone.Designer.cs">
+      <DependentUpon>201508121537394_Left Email Alone.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -311,6 +331,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508101801527_Checking in the field update.resx">
       <DependentUpon>201508101801527_Checking in the field update.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508112038002_CHangedUserModel.resx">
+      <DependentUpon>201508112038002_CHangedUserModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508121110318_MadeIndexesNotUnique.resx">
+      <DependentUpon>201508121110318_MadeIndexesNotUnique.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508121115567_overrode username.resx">
+      <DependentUpon>201508121115567_overrode username.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508121355367_Left Username Alone.resx">
+      <DependentUpon>201508121355367_Left Username Alone.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508121537394_Left Email Alone.resx">
+      <DependentUpon>201508121537394_Left Email Alone.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,6 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.Infrastructure.Annotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web.Mvc;
+using System.Xml.Serialization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -13,6 +18,20 @@ namespace WebWIthIdentity.Models
 
         //extra variables
         public ICollection<Field> Fields { get; set; }
+
+        [Index(IsUnique = false)]
+        new public long PhoneNumber
+        {
+            get
+            {
+                long phoneNumber; 
+                Int64.TryParse(base.PhoneNumber, out phoneNumber);
+                return phoneNumber;
+            }
+            set { base.PhoneNumber = PhoneNumber.ToString(); }
+        } //overrides the default 
+
+        public string RealName { get; set; }
 
         public ApplicationUser() 
         {

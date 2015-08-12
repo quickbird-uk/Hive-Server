@@ -51,13 +51,14 @@ namespace WebWIthIdentity
             //    clientId: "",
             //    clientSecret: "");
 
-            //app.UseTwitterAuthentication(
-            //    consumerKey: "",
-            //    consumerSecret: "");
+            //Application ID: 8651228 Access level: Read-Write
+            app.UseTwitterAuthentication(
+                consumerKey: "IcPOmzv8Tr0x13ztIB0AVUb4A",
+                consumerSecret: "KQioe7ozUcGenn9xf3XvjqLBMTUrVcFw8tQnkLsNewQWjQZqDQ");
 
-            //app.UseFacebookAuthentication(
-            //    appId: "",
-            //    appSecret: "");
+            app.UseFacebookAuthentication(
+                appId: "1476624489324204",
+                appSecret: "78affbd4d44656d8feba9907f6c8d401");
 
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{

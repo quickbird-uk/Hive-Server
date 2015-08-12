@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -32,9 +33,17 @@ namespace WebWIthIdentity.Models
         public string ConfirmPassword { get; set; }
     }
 
-    public class RegisterBindingModel
+    public class RegisterBindingModel : IValidatableObject
     {
-        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "RealName")]
+        public string RealName { get; set; }
+
+        [DataType(DataType.PhoneNumber)]
+        [Display(Name = "Phone")]
+        public long Phone { get; set; }
+
+        [DataType(DataType.EmailAddress)]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
@@ -48,6 +57,17 @@ namespace WebWIthIdentity.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            string notnullEmail = Email ?? string.Empty; 
+
+                //phone is missing                    Email is invalid
+            if (Phone < 10000 && (notnullEmail.Length > 5 && !notnullEmail.Contains("@")))
+            {
+                yield return new ValidationResult("Provide valid Phone or Email");
+            }
+        }
     }
 
     public class RegisterExternalBindingModel
