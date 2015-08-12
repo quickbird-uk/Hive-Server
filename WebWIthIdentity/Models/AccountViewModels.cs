@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebWIthIdentity.Models
 {
@@ -27,7 +28,15 @@ namespace WebWIthIdentity.Models
 
     public class UserInfoViewModel
     {
+        public string Name { get; set; }
+
+        [DataType(DataType.PhoneNumber)]
+        public long Phone { get; set; }
+
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
+
+        public string Twitter { get; set; }
 
         public bool HasRegistered { get; set; }
 
@@ -40,4 +49,5 @@ namespace WebWIthIdentity.Models
 
         public string ProviderKey { get; set; }
     }
+
 }
