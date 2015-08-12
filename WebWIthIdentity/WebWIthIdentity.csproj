@@ -34,6 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>/App_Data/XmlDocument.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -243,6 +244,10 @@
     <Compile Include="Migrations\201508121537394_Left Email Alone.Designer.cs">
       <DependentUpon>201508121537394_Left Email Alone.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201508121639163_Added Twitter.cs" />
+    <Compile Include="Migrations\201508121639163_Added Twitter.Designer.cs">
+      <DependentUpon>201508121639163_Added Twitter.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -346,6 +351,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201508121537394_Left Email Alone.resx">
       <DependentUpon>201508121537394_Left Email Alone.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201508121639163_Added Twitter.resx">
+      <DependentUpon>201508121639163_Added Twitter.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

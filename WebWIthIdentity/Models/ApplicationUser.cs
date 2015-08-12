@@ -28,20 +28,21 @@ namespace WebWIthIdentity.Models
                 Int64.TryParse(base.PhoneNumber, out phoneNumber);
                 return phoneNumber;
             }
-            set { base.PhoneNumber = PhoneNumber.ToString(); }
+            set { base.PhoneNumber = value.ToString(); }
         } //overrides the default 
 
         public string RealName { get; set; }
+
+        public string Twitter { get; set; }
 
         public ApplicationUser() 
         {
             Fields = new List<Field>();
         }
 
+        
 
-
-
-        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
+    public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync(this, authenticationType);

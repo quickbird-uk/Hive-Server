@@ -54,19 +54,60 @@ namespace WebWIthIdentity.Controllers
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
+
+
         // GET api/Account/UserInfo
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("UserInfo")]
-        public UserInfoViewModel GetUserInfo()
+        public async Task<UserInfoViewModel> GetUserInfo()
         {
             ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
 
+            var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+
             return new UserInfoViewModel
             {
-                Email = User.Identity.GetUserName(),
+                Name = thisUser.RealName,
+                Email = thisUser.Email,
+                Phone = thisUser.PhoneNumber,
+                Twitter = thisUser.Twitter,
                 HasRegistered = externalLogin == null,
                 LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
             };
+        }
+
+        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
+        [Route("ChangeEmail")]
+        public async Task<IHttpActionResult> ChangeEmail(ChangeEmailBindingModel model)
+        {
+            var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            thisUser.Email = model.Email;
+            await UserManager.UpdateAsync(thisUser);
+            return Ok(); 
+        }
+
+        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
+        [Route("ChangePhone")]
+        public async Task<IHttpActionResult> ChangePhone(ChangePhoneBindingModel model)
+        {
+            var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            thisUser.PhoneNumber = model.PhoneNumber;
+            await UserManager.UpdateAsync(thisUser);
+            return Ok();
+        }
+
+        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
+        [Route("ChangeMisc")]
+        public async Task<IHttpActionResult> ChangePhone(ChangeMiscBindingModel model)
+        {
+            var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (!string.IsNullOrWhiteSpace(model.RealName))
+                thisUser.RealName = model.RealName;
+            if (!string.IsNullOrWhiteSpace(model.Twitter))
+                thisUser.Twitter = model.Twitter;
+           
+            await UserManager.UpdateAsync(thisUser);
+            return Ok();
         }
 
         // POST api/Account/Logout
@@ -117,6 +158,9 @@ namespace WebWIthIdentity.Controllers
             };
         }
 
+        
+        
+        
         // POST api/Account/ChangePassword
         [Route("ChangePassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
@@ -358,7 +402,8 @@ namespace WebWIthIdentity.Controllers
                     {
                         Email = suppliedEmail,
                         PhoneNumber = model.Phone,
-                        RealName = realName
+                        RealName = realName,
+                        Twitter = model.Twitter ?? String.Empty
                     }; //create user
 
                     user.UserName = user.Id;

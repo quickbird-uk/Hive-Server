@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -33,7 +34,7 @@ namespace WebWIthIdentity.Controllers
             
             var userID = User.Identity.GetUserId();
 
-            var foundfields =  db.Fields.Where(f => f.ApplicationUserId.Equals(userID)).ToList();
+            var foundfields =  await db.Fields.Where(f => f.ApplicationUserId.Equals(userID)).ToListAsync();
 
             List<FieldViewModel> filtered = new List<FieldViewModel>();
 
