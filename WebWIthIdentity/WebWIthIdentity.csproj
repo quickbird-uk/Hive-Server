@@ -34,7 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>/App_Data/XmlDocument.xml</DocumentationFile>
+    <DocumentationFile>bin\App_Data/XmlDocument.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -287,6 +287,7 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
+    <None Include="Properties\PublishProfiles\BirdApi %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\BirdApi.pubxml" />
     <None Include="Properties\PublishProfiles\QuickbirdAPI.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
