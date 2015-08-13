@@ -17,7 +17,7 @@ namespace WebWIthIdentity.Models
     {
 
         //extra variables
-        public ICollection<Field> Fields { get; set; }
+        public ICollection<Farm> Fields { get; set; }
 
         [Index(IsUnique = false)]
         new public long PhoneNumber
@@ -37,12 +37,24 @@ namespace WebWIthIdentity.Models
 
         public ApplicationUser() 
         {
-            Fields = new List<Field>();
+            Fields = new List<Farm>();
         }
 
-        
+        /*house Number*/
+        public int HouseNumber { get; set; }
 
-    public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
+        /*three lines for address, one should be mandatory*/
+        public String Address1 { get; set; } //Not Null
+        public String Address2 { get; set; }
+        public String Address3 { get; set; }
+
+        public String City { get; set; } //Not Null
+
+        public String Country { get; set; } //Not Null
+
+        public String Postcode { get; set; } //Not Null
+
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync(this, authenticationType);

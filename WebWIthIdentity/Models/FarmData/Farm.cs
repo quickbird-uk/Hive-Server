@@ -9,17 +9,17 @@ using Microsoft.Owin.BuilderProperties;
 
 namespace WebWIthIdentity.Models
 {
-    public class Field
+    public class Farm
     {
 
 
-        public Field()
+        public Farm()
         {
             disabled = false;
             created = DateTime.Now;
         }
 
-        public Field(string inName, string inDesctiption = "", double inLatt = 0,  double inLong = 0)
+        public Farm(string inName, string inDesctiption = "", double inLatt = 0,  double inLong = 0)
         {
             name = inName;
             description = inDesctiption;
@@ -46,12 +46,27 @@ namespace WebWIthIdentity.Models
         public DateTime lastUpdated { get; set; }
 
 
+        /*house Number*/
+        public int HouseNumber { get; set; }
+
+        /*three lines for address, one should be mandatory*/
+        public String Address1 { get; set; } //Not Null
+        public String Address2 { get; set; }
+        public String Address3 { get; set; }
+
+        public String City { get; set; } //Not Null
+
+        public String Country { get; set; } //Not Null
+
+        public String Postcode { get; set; } //Not Null
+
+
 
         public bool disabled { get; set; }
 
     }
 
-    public class FieldBindingModel
+    public class FarmBindingModel
     {
         [Required]
         [Display(Name = "FieldName")]
@@ -71,7 +86,7 @@ namespace WebWIthIdentity.Models
     }
 
 
-    public class FieldViewModel
+    public class FarmViewModel
     {
         public long id { get; set; }
 

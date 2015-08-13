@@ -15,7 +15,7 @@ using WebWIthIdentity.Models;
 namespace WebWIthIdentity.Controllers
 {
     [Authorize]
-    public class FieldsController : ApiController
+    public class FarmController : ApiController
     {
 
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -28,15 +28,16 @@ namespace WebWIthIdentity.Controllers
             }
         }
 
-        // GET Fields
+        // GET Farms
         public async Task<IHttpActionResult> Get()
         {
             
             var userID = User.Identity.GetUserId();
 
-            var foundfields =  await db.Fields.Where(f => f.ApplicationUserId.Equals(userID)).ToListAsync();
+            
+            var foundfields =  await db.Farms.Where(f => f.ApplicationUserId.Equals(userID)).ToListAsync();
 
-            List<FieldViewModel> filtered = new List<FieldViewModel>();
+            List<FarmViewModel> filtered = new List<FarmViewModel>();
 
             foreach (var field in foundfields)
             {
@@ -49,12 +50,12 @@ namespace WebWIthIdentity.Controllers
             return Ok(filtered);
         }
 
-        [Route("Fields/{fieldId}")]
+        [Route("Farms/{farmId}")]
         public IHttpActionResult Get([FromUri] long fieldId)
         {
             var userId = User.Identity.GetUserId();
 
-            var requestedField = db.Fields.Find(fieldId);
+            var requestedField = db.Farms.Find(fieldId);
 
             if (requestedField == null)
             {
@@ -73,7 +74,7 @@ namespace WebWIthIdentity.Controllers
         }
 
         
-        public async Task<IHttpActionResult> Post([FromBody]FieldBindingModel model)
+        public async Task<IHttpActionResult> Post([FromBody]FarmBindingModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -85,7 +86,7 @@ namespace WebWIthIdentity.Controllers
             }
             else
             {
-                var newfield = new Field(
+                var newFarm = new Farm(
                     model.name,
                     model.description,
                     model.longitude ,
@@ -93,24 +94,30 @@ namespace WebWIthIdentity.Controllers
                 );
 
                 var UserID = User.Identity.GetUserId(); 
-                var userDb = db.Users.Find(UserID);
+                var userDb =  db.Users.Find(UserID);
+                var userManaged = await UserManager.FindByIdAsync(UserID); 
+
                 if (userDb == null)
                 {
                     return Unauthorized();
                 }
                 else
                 {
-                    userDb.Fields.Add(newfield);
+                    
+                    
+                    userDb.Fields.Add(newFarm);
+                    userManaged.Fields.Add(newFarm);
 
                     await db.SaveChangesAsync();
+                    await UserManager.UpdateAsync(userManaged);
 
-                    return Ok(FieldToViewModel(newfield));
+                    return Ok(FieldToViewModel(newFarm));
                 }
             }
         }
 
-        [Route("Fields/{fieldId}")]
-        public async Task<IHttpActionResult> Put([FromUri]long fieldId, [FromBody]FieldBindingModel model)
+        [Route("Farms/{farmId}")]
+        public async Task<IHttpActionResult> Put([FromUri]long farmId, [FromBody]FarmBindingModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -124,7 +131,7 @@ namespace WebWIthIdentity.Controllers
             {
                 var userId = User.Identity.GetUserId();
 
-                var editedField = db.Fields.Find(fieldId);
+                var editedField = db.Farms.Find(farmId);
 
                 if (editedField == null)
                 {
@@ -153,12 +160,12 @@ namespace WebWIthIdentity.Controllers
             }
         }
 
-        [Route("Fields/{fieldId}")]
-        public async Task<IHttpActionResult> Delete([FromUri]long fieldId)
+        [Route("Farms/{farmId}")]
+        public async Task<IHttpActionResult> Delete([FromUri]long farmId)
         {
             var userId = User.Identity.GetUserId();
 
-            var editedField = db.Fields.Find(fieldId);
+            var editedField = db.Farms.Find(farmId);
 
             if (editedField == null)
             {
@@ -179,17 +186,17 @@ namespace WebWIthIdentity.Controllers
 
 
 
-        internal static FieldViewModel FieldToViewModel(Field field)
+        internal static FarmViewModel FieldToViewModel(Farm farm)
         {
-            return (new FieldViewModel()
+            return (new FarmViewModel()
             {
-                id = field.Id,
-                name = field.name,
-                description = field.description,
-                lattitude = field.lattitude,
-                longitude = field.longitude,
-                created = field.created,
-                lastUpdated = field.lastUpdated
+                id = farm.Id,
+                name = farm.name,
+                description = farm.description,
+                lattitude = farm.lattitude,
+                longitude = farm.longitude,
+                created = farm.created,
+                lastUpdated = farm.lastUpdated
             });
 
         }

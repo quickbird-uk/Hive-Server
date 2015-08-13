@@ -37,7 +37,7 @@ namespace WebWIthIdentity.Models
     {
         [DataType(DataType.Text)]
         [Display(Name = "Name")]
-        public string RealName { get; set; }
+        public string Name { get; set; }
 
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Phone")]
@@ -134,12 +134,12 @@ namespace WebWIthIdentity.Models
         public string Twitter;
 
         [Display(Name = "Name")]
-        public string RealName;
+        public string Name;
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             // if it's too short or does not have at character
-            if (string.IsNullOrWhiteSpace(RealName) && string.IsNullOrWhiteSpace(Twitter))
+            if (string.IsNullOrWhiteSpace(Name) && string.IsNullOrWhiteSpace(Twitter))
             {
                 yield return new ValidationResult("You provided no information");
             }

@@ -104,8 +104,8 @@ namespace WebWIthIdentity.Controllers
         public async Task<IHttpActionResult> ChangePhone(ChangeMiscBindingModel model)
         {
             var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-            if (!string.IsNullOrWhiteSpace(model.RealName))
-                thisUser.RealName = model.RealName;
+            if (!string.IsNullOrWhiteSpace(model.Name))
+                thisUser.RealName = model.Name;
             if (!string.IsNullOrWhiteSpace(model.Twitter))
                 thisUser.Twitter = model.Twitter;
            
@@ -387,7 +387,7 @@ namespace WebWIthIdentity.Controllers
             else
             {
                 string suppliedEmail = model.Email ?? String.Empty; //eliminate possibility of email being null, and crashing the programm
-                string realName = model.RealName ?? string.Empty; 
+                string realName = model.Name ?? string.Empty; 
                 string intUserName = model.Email ?? model.Phone.ToString(); 
                 
 
@@ -413,7 +413,7 @@ namespace WebWIthIdentity.Controllers
                     }; //create user
 
                     user.UserName = user.Id;
-                    IdentityResult result; 
+                    IdentityResult result =  new IdentityResult(); 
 
                     try
                     {
@@ -426,22 +426,20 @@ namespace WebWIthIdentity.Controllers
                     {
                         foreach (var eve in e.EntityValidationErrors)
                         {
-                            Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                                eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                            ModelState.AddModelError("Entity of type " 
+                                + eve.Entry.Entity.GetType().Name, "in state " + eve.Entry.State + " has the following validation errors");
+
                             foreach (var ve in eve.ValidationErrors)
                             {
-                                Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                                    ve.PropertyName, ve.ErrorMessage);
+                                ModelState.AddModelError(ve.PropertyName, ve.ErrorMessage);
                             }
                         }
-                        throw;
                     }
-
                     
 
                     if (!result.Succeeded)
                     {
-                        return GetErrorResult(result);
+                        return BadRequest(ModelState);
                     }
 
                     return Ok();

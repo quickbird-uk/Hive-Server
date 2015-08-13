@@ -10,13 +10,14 @@ namespace WebWIthIdentity.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
 
-        public DbSet<Field> Fields { get; set; }
+        public DbSet<Farm> Farms { get; set; }
 
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
-
+            Configuration.LazyLoadingEnabled = false; 
+           
         }
 
         public static ApplicationDbContext Create()
