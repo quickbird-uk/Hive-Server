@@ -55,7 +55,7 @@ namespace WebWIthIdentity.Controllers
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
 
-
+        ///<summary>Retrieves general information about the user's account.</summary>
         // GET api/Account/UserInfo
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("UserInfo")]
@@ -76,6 +76,7 @@ namespace WebWIthIdentity.Controllers
             };
         }
 
+        ///<summary>Changes user's Email. Eventually it will even require user to confirm it.</summary>
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("ChangeEmail")]
         public async Task<IHttpActionResult> ChangeEmail(ChangeEmailBindingModel model)
@@ -86,6 +87,7 @@ namespace WebWIthIdentity.Controllers
             return Ok(); 
         }
 
+        ///<summary>Changes user's phone number. Eventually it will even require user to confirm it.</summary>
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("ChangePhone")]
         public async Task<IHttpActionResult> ChangePhone(ChangePhoneBindingModel model)
@@ -96,6 +98,7 @@ namespace WebWIthIdentity.Controllers
             return Ok();
         }
 
+        ///<summary>Changes miscaleneous fields on the user's account, those of secondary importance</summary>
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("ChangeMisc")]
         public async Task<IHttpActionResult> ChangePhone(ChangeMiscBindingModel model)
@@ -111,6 +114,7 @@ namespace WebWIthIdentity.Controllers
         }
 
         // POST api/Account/Logout
+        ///<summary>Disregard</summary>
         [Route("Logout")]
         public IHttpActionResult Logout()
         {
@@ -119,6 +123,7 @@ namespace WebWIthIdentity.Controllers
         }
 
         // GET Account/ManageInfo?returnUrl=%2F&generateState=true
+        ///<summary>Disregard</summary>
         [Route("ManageInfo")]
         public async Task<ManageInfoViewModel> GetManageInfo(string returnUrl, bool generateState = false)
         {
@@ -158,10 +163,10 @@ namespace WebWIthIdentity.Controllers
             };
         }
 
-        
-        
-        
-        // POST api/Account/ChangePassword
+
+
+
+        ///<summary>Use this method to set change password on a user's account</summary>
         [Route("ChangePassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
         {
@@ -181,7 +186,7 @@ namespace WebWIthIdentity.Controllers
             return Ok();
         }
 
-        // POST api/Account/SetPassword
+        ///<summary>Disregard</summary>
         [Route("SetPassword")]
         public async Task<IHttpActionResult> SetPassword(SetPasswordBindingModel model)
         {
@@ -200,7 +205,7 @@ namespace WebWIthIdentity.Controllers
             return Ok();
         }
 
-        // POST api/Account/AddExternalLogin
+        ///<summary>Disregard</summary>
         [Route("AddExternalLogin")]
         public async Task<IHttpActionResult> AddExternalLogin(AddExternalLoginBindingModel model)
         {
@@ -238,7 +243,7 @@ namespace WebWIthIdentity.Controllers
             return Ok();
         }
 
-        // POST api/Account/RemoveLogin
+        ///<summary>Disregard</summary>
         [Route("RemoveLogin")]
         public async Task<IHttpActionResult> RemoveLogin(RemoveLoginBindingModel model)
         {
@@ -267,7 +272,7 @@ namespace WebWIthIdentity.Controllers
             return Ok();
         }
 
-        // GET api/Account/ExternalLogin
+        ///<summary>Disregard</summary>
         [OverrideAuthentication]
         [HostAuthentication(DefaultAuthenticationTypes.ExternalCookie)]
         [AllowAnonymous]
@@ -325,6 +330,7 @@ namespace WebWIthIdentity.Controllers
         }
 
         // GET api/Account/ExternalLogins?returnUrl=%2F&generateState=true
+        ///<summary>Disregard</summary>
         [AllowAnonymous]
         [Route("ExternalLogins")]
         public IEnumerable<ExternalLoginViewModel> GetExternalLogins(string returnUrl, bool generateState = false)
@@ -365,7 +371,7 @@ namespace WebWIthIdentity.Controllers
             return logins;
         }
 
-        // POST api/Account/Register
+        ///<summary>Creates a new user with Local authentication</summary>
         [AllowAnonymous]
         [Route("Register")]
         public async Task<IHttpActionResult> Register(RegisterBindingModel model)
@@ -446,6 +452,7 @@ namespace WebWIthIdentity.Controllers
         }
 
         // POST api/Account/RegisterExternal
+        ///<summary>Disregard</summary>
         [OverrideAuthentication]
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("RegisterExternal")]
