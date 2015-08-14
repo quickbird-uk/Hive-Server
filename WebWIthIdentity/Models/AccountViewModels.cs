@@ -43,6 +43,35 @@ namespace WebWIthIdentity.Models
         public string LoginProvider { get; set; }
     }
 
+
+    public class SearchViewModel
+    {
+        public int Invalid { get; set; }
+        public int NotFound { get; set; }
+        public int Found{ get; set; }
+
+        public SearchViewModel ()
+        {
+            FoundContacts = new List<OtherUserInfoViewModel>();
+        }
+
+        public List<OtherUserInfoViewModel> FoundContacts { get; set; }
+}
+
+
+    public class OtherUserInfoViewModel
+    {
+        public string Name { get; set; }
+
+        [DataType(DataType.PhoneNumber)]
+        public long Phone { get; set; }
+
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
+
+        public Guid ID { get; set; }
+    }
+
     public class UserLoginInfoViewModel
     {
         public string LoginProvider { get; set; }

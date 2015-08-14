@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using Microsoft.Owin.BuilderProperties;
+using WebWIthIdentity.Models.FarmData;
 
 namespace WebWIthIdentity.Models
 {
@@ -19,6 +20,7 @@ namespace WebWIthIdentity.Models
             created = DateTime.Now;
             Managers = new List<ApplicationUser>();
             Crew = new List<ApplicationUser>();
+            Fields = new List<Field>();
         }
 
         public Farm(string inName, string inDesctiption = "", double inLatt = 0,  double inLong = 0)
@@ -32,6 +34,7 @@ namespace WebWIthIdentity.Models
             lastUpdated = DateTime.Now;
             Managers = new List<ApplicationUser>();
             Crew = new List<ApplicationUser>();
+            Fields = new List<Field>();
         }
 
         [Key]
@@ -39,6 +42,8 @@ namespace WebWIthIdentity.Models
 
         public virtual List<ApplicationUser> Managers { get; set; }
         public virtual List<ApplicationUser> Crew { get; set; }
+
+        public virtual List<Field> Fields { get; set; }
 
         public String name { get; set; }
         public String description { get; set; }

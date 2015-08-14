@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using WebWIthIdentity.Models;
+using WebWIthIdentity.Models.FarmData;
 
 namespace WebWIthIdentity.Migrations
 {
@@ -23,6 +25,8 @@ namespace WebWIthIdentity.Migrations
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data. E.g.
             var passwordHasher = new PasswordHasher();
+            bool emptyDatabase = false;
+            string[] crops = {"Corn", "Maise", "Potato", "Nothing", "Wheat", "Rapeseed", "Barley", "Peas", "Oats", "Buckwheat", "Wheat"}; //11 crops to seed the database
 
             ApplicationUser[] users = new ApplicationUser[5];
             users[0] = new ApplicationUser
@@ -80,10 +84,52 @@ namespace WebWIthIdentity.Migrations
                 Postcode = "B29 6TP"
             };
 
-            //users[4].FarmsOwned.Add(
-            //{
+            if (! context.Farms.Any()) //seed if there are no farms 
+            {
+                emptyDatabase = true;
+                List<Farm> AllFarms = new List<Farm>();
+
+                foreach (var user in users)
+                {
+                    var farm = new Farm(user.RealName + "'s Farm"); 
+                    user.FarmsOwned.Add(farm);
+                    AllFarms.Add(farm);
+                }
+
+
+                foreach (var  user in users)
+                {
+                    users[1].FarmsWorking.Add(user.FarmsOwned[0]);
+                }
+                users[0].FarmsWorking.Add(users[3].FarmsOwned[0]);
+
+                Random RNG = new Random();
                 
-            //});
+                users[4].FarmsOwned.Add(new Farm("Another Farm", "this is a huge macdonalds farm!"));
+                AllFarms.Add(users[4].FarmsOwned[1]);
+                users[1].FarmsWorking.Add(users[4].FarmsOwned[1]);
+
+               
+
+                foreach (var farm in AllFarms)
+                {
+                    int nOfFields = RNG.Next(3, 20);
+                    double fieldSize = 0;
+                    while(fieldSize  < 0.1)
+                    {
+                        fieldSize = RNG.NextDouble();
+                    }
+                    fieldSize = fieldSize*10; 
+
+                    for (int i=0; i < nOfFields; i++)
+                    {
+                       
+                        farm.Fields.Add(new Field(crops[RNG.Next(11)] + " " + (RNG.Next(2, 6) * fieldSize).ToString("0.#") + " ha"));
+                    }
+                            
+                }
+            }
+
 
             foreach (var user in users)
             {

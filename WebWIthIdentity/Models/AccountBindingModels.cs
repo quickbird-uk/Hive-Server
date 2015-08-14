@@ -92,6 +92,18 @@ namespace WebWIthIdentity.Models
         public string ProviderKey { get; set; }
     }
 
+    public class SearchBindingModel  
+    {
+        [Required]
+        public virtual List<string> SearchContacts { get; set; }
+
+        public SearchBindingModel()
+        {
+            SearchContacts = new List<string>();
+        }
+
+    }
+
     public class ChangeEmailBindingModel : IValidatableObject
     {
         [Required]
@@ -130,11 +142,11 @@ namespace WebWIthIdentity.Models
 
     public class ChangeMiscBindingModel : IValidatableObject
     {
-        [Display(Name = "Twitter")]
-        public string Twitter;
+     
+        public string Twitter { get; set; }
 
-        [Display(Name = "Name")]
-        public string Name;
+
+        public string Name { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

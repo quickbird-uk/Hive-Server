@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -81,6 +82,10 @@ namespace WebWIthIdentity.Controllers
         [Route("ChangeEmail")]
         public async Task<IHttpActionResult> ChangeEmail(ChangeEmailBindingModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
             thisUser.Email = model.Email;
             await UserManager.UpdateAsync(thisUser);
@@ -92,6 +97,10 @@ namespace WebWIthIdentity.Controllers
         [Route("ChangePhone")]
         public async Task<IHttpActionResult> ChangePhone(ChangePhoneBindingModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
             thisUser.PhoneNumber = model.PhoneNumber;
             await UserManager.UpdateAsync(thisUser);
@@ -101,8 +110,12 @@ namespace WebWIthIdentity.Controllers
         ///<summary>Changes miscaleneous fields on the user's account, those of secondary importance</summary>
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("ChangeMisc")]
-        public async Task<IHttpActionResult> ChangePhone(ChangeMiscBindingModel model)
+        public async Task<IHttpActionResult> ChangeMisc(ChangeMiscBindingModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
             if (!string.IsNullOrWhiteSpace(model.Name))
                 thisUser.RealName = model.Name;
@@ -111,6 +124,89 @@ namespace WebWIthIdentity.Controllers
            
             await UserManager.UpdateAsync(thisUser);
             return Ok();
+        }
+
+        ///<summary>Searches for users based on the array yousubmit. 
+        /// The array is of strings, and can have mixed phone numbers and emails, thiswill be prssesed regardless</summary>
+        /// 
+        
+        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
+        [Route("SearchUsers")]
+        public async Task<IHttpActionResult> SearchUsers(SearchBindingModel model)
+        {
+            SearchViewModel reply = new SearchViewModel();
+            List<ApplicationUser> foundUsers = new List<ApplicationUser>();
+
+            if (model == null)
+                return BadRequest("No Data");
+
+            if (model.SearchContacts.Count == 0)
+                return BadRequest("No Data");
+            if (model.SearchContacts.Count > 1000)
+                return BadRequest("You shall not search more than 1000 users at once, because fuck you");
+            
+
+            foreach (var searchItem in model.SearchContacts)
+            {
+                if (!string.IsNullOrWhiteSpace(searchItem))
+                {
+                    if (searchItem.Length > 5)
+                    {
+                        long phone;
+                        if (Int64.TryParse(searchItem, out phone))
+                        {
+                            var user = await UserManager.Users.FirstOrDefaultAsync(p => p.PhoneNumber == phone);
+                            if (user != null)
+                            {
+                                reply.Found++;
+                                foundUsers.Add(user);
+                            }
+                            else
+                            {
+                                reply.NotFound++; 
+                            }
+                        }
+                        else if(searchItem.Contains("@"))
+                        {
+                            var user = await UserManager.FindByEmailAsync(searchItem);
+                            if (user != null)
+                            {
+                                reply.Found++;
+                                foundUsers.Add(user);
+                            }
+                            else
+                            {
+                                reply.NotFound++;
+                            }
+                        }
+                        else
+                        {
+                            reply.Invalid++;
+                        }
+                    }
+                    else
+                    {
+                        reply.Invalid++;
+                    }
+                }
+                else
+                {
+                    reply.Invalid++;
+                }
+            }
+
+            foreach (ApplicationUser user in foundUsers)
+            {
+                reply.FoundContacts.Add(new OtherUserInfoViewModel
+                {
+                    Phone = user.PhoneNumber,
+                    Name = user.RealName,
+                    Email = user.Email,
+                    ID = Guid.Parse(user.Id)
+                });
+            }
+
+            return Ok(reply);
         }
 
         // POST api/Account/Logout
