@@ -24,7 +24,7 @@ namespace WebWIthIdentity.Migrations
             //  to avoid creating duplicate seed data. E.g.
             var passwordHasher = new PasswordHasher();
 
-            ApplicationUser[] users = new ApplicationUser[4];
+            ApplicationUser[] users = new ApplicationUser[5];
             users[0] = new ApplicationUser
             {
                 RealName = "Bob Stone",
@@ -66,6 +66,24 @@ namespace WebWIthIdentity.Migrations
                 PhoneNumber = 545648,
                 Email = "test@test.uk"
             };
+
+            users[4] = new ApplicationUser
+            {
+                RealName = "Vladimir Akopyan",
+                Twitter = "@ClumsyPilot",
+                PhoneNumber = 7842723489,
+                Email = "vlad@quickbird.uk",
+                HouseNumber = 7,
+                Address1 = "Saunton Way",
+                City = "Birmingham",
+                Country = "UK",
+                Postcode = "B29 6TP"
+            };
+
+            //users[4].FarmsOwned.Add(
+            //{
+                
+            //});
 
             foreach (var user in users)
             {

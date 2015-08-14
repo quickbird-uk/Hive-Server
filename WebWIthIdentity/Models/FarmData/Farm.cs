@@ -17,6 +17,8 @@ namespace WebWIthIdentity.Models
         {
             disabled = false;
             created = DateTime.Now;
+            Managers = new List<ApplicationUser>();
+            Crew = new List<ApplicationUser>();
         }
 
         public Farm(string inName, string inDesctiption = "", double inLatt = 0,  double inLong = 0)
@@ -28,15 +30,15 @@ namespace WebWIthIdentity.Models
             disabled = false;
             created = DateTime.Now;
             lastUpdated = DateTime.Now;
+            Managers = new List<ApplicationUser>();
+            Crew = new List<ApplicationUser>();
         }
 
         [Key]
         public long Id { get; set; }
 
-        
-        public string ApplicationUserId { get; set; }
-
-       
+        public virtual List<ApplicationUser> Managers { get; set; }
+        public virtual List<ApplicationUser> Crew { get; set; }
 
         public String name { get; set; }
         public String description { get; set; }
@@ -83,6 +85,7 @@ namespace WebWIthIdentity.Models
 
         [Display(Name = "Lattitude")]
         public double lattitude { get; set; }
+
     }
 
 
@@ -101,5 +104,7 @@ namespace WebWIthIdentity.Models
         public DateTime created { get; set; }
 
         public DateTime lastUpdated { get; set; }
+        
+        public bool Owner { get; set; }
     }
 }

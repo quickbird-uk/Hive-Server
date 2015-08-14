@@ -12,6 +12,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using WebWIthIdentity.Models;
 
+
 namespace WebWIthIdentity.Controllers
 {
     [Authorize]
@@ -35,21 +36,34 @@ namespace WebWIthIdentity.Controllers
             var userID = User.Identity.GetUserId();
 
             
-            var foundfields =  await db.Farms.Where(f => f.ApplicationUserId.Equals(userID)).ToListAsync();
+            var foundfarmsManaged =  await db.Farms.Where(f => f.Managers.Contains(
+                db.Users.Find(userID))).ToListAsync();
+
+            var foundfarmsWorking = await db.Farms.Where(f => f.Crew.Contains(
+               db.Users.Find(userID))).ToListAsync();
 
             List<FarmViewModel> filtered = new List<FarmViewModel>();
 
-            foreach (var field in foundfields)
+            foreach (var farm in foundfarmsManaged)
             {
-                if (!field.disabled)
+                if (!farm.disabled)
                 {
-                    filtered.Add(FieldToViewModel(field));
+                    filtered.Add(FieldToViewModel(farm, true));
                 }
             }
-            
+
+            foreach (var farm in foundfarmsWorking)
+            {
+                if (!farm.disabled)
+                {
+                    filtered.Add(FieldToViewModel(farm, false));
+                }
+            }
+
             return Ok(filtered);
         }
 
+        /*
         [Route("Farms/{farmId}")]
         public IHttpActionResult Get([FromUri] long fieldId)
         {
@@ -105,8 +119,8 @@ namespace WebWIthIdentity.Controllers
                 {
                     
                     
-                    userDb.Fields.Add(newFarm);
-                    userManaged.Fields.Add(newFarm);
+                    userDb.FarmsOwned.Add(newFarm);
+                    userManaged.FarmsOwned.Add(newFarm);
 
                     await db.SaveChangesAsync();
                     await UserManager.UpdateAsync(userManaged);
@@ -183,10 +197,10 @@ namespace WebWIthIdentity.Controllers
                 return Unauthorized();
             }
         }
+        */
 
 
-
-        internal static FarmViewModel FieldToViewModel(Farm farm)
+        internal static FarmViewModel FieldToViewModel(Farm farm, bool owner)
         {
             return (new FarmViewModel()
             {
@@ -196,7 +210,8 @@ namespace WebWIthIdentity.Controllers
                 lattitude = farm.lattitude,
                 longitude = farm.longitude,
                 created = farm.created,
-                lastUpdated = farm.lastUpdated
+                lastUpdated = farm.lastUpdated,
+                Owner = owner
             });
 
         }

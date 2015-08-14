@@ -1,16 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
 namespace WebWIthIdentity.Models
 {
-    public class Contact
-    {
+    /// <summary>
+    /// Records form a contact book. Contact book is a list of people each user knows on the system. 
+    /// </summary>
+    //public class Contact
+    //{
 
-        ApplicationUser P1 { get; set; }
+    //    public virtual string OwnerID { get; set; }
 
-        ApplicationUser P2 { get; set; }
 
-    }
+    //    public virtual string ContactID { get; set; }
+
+    //    string Nickname { get; set; }
+
+    //}
 }

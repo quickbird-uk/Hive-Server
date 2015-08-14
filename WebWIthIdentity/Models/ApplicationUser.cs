@@ -16,9 +16,7 @@ namespace WebWIthIdentity.Models
     public class ApplicationUser : IdentityUser
     {
 
-        //extra variables
-        public ICollection<Farm> Fields { get; set; }
-
+ 
         [Index(IsUnique = false)]
         new public long PhoneNumber
         {
@@ -31,13 +29,29 @@ namespace WebWIthIdentity.Models
             set { base.PhoneNumber = value.ToString(); }
         } //overrides the default 
 
+        
         public string RealName { get; set; }
 
         public string Twitter { get; set; }
 
+        /// <summary>
+        /// This is a Contact book, it is a list of people that use the system that the user has saved 
+        /// </summary>
+        //public virtual List<Contact> ContactBook { get; set; }
+        /// <summary>
+        /// The list of farms owned by the person
+        /// </summary>
+        public virtual List<Farm> FarmsOwned { get; set; }
+        /// <summary>
+        /// The list of farms where the person works
+        /// </summary>
+        public virtual List<Farm> FarmsWorking { get; set; }
+
         public ApplicationUser() 
         {
-            Fields = new List<Farm>();
+            FarmsOwned = new List<Farm>();
+            FarmsWorking = new List<Farm>();
+           // ContactBook = new List<Contact>();
         }
 
         /*house Number*/
