@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.Http.ModelBinding;
 using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
@@ -17,6 +18,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
+using WebGrease.Css.Extensions;
 using WebWIthIdentity.Models;
 using WebWIthIdentity.Providers;
 using WebWIthIdentity.Results;
@@ -27,6 +29,9 @@ namespace WebWIthIdentity.Controllers
     [RoutePrefix("Account")]
     public class AccountController : ApiController
     {
+        private ApplicationDbContext db = new ApplicationDbContext();
+
+
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
 
@@ -59,22 +64,39 @@ namespace WebWIthIdentity.Controllers
         ///<summary>Retrieves general information about the user's account.</summary>
         // GET api/Account/UserInfo
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
+        [ResponseType(typeof(UserInfoViewModel))]
         [Route("UserInfo")]
-        public async Task<UserInfoViewModel> GetUserInfo()
+        public async Task<IHttpActionResult> GetUserInfo()
         {
             ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
+            var UserId = User.Identity.GetUserId(); 
 
-            var thisUser = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            var thisUser =
+                await
+                    UserManager.Users.Where(p => p.Id == UserId)
+                        .Include(p => p.ContactBook.Select(u => u.Contact)) //Includes The contactbook, and all the users in the contactbook in a single SQL statement
+                        .FirstOrDefaultAsync();
 
-            return new UserInfoViewModel
+            if (thisUser != null)
             {
-                Name = thisUser.RealName,
-                Email = thisUser.Email,
-                Phone = thisUser.PhoneNumber,
-                Twitter = thisUser.Twitter,
-                HasRegistered = externalLogin == null,
-                LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
-            };
+                var uView = new UserInfoViewModel
+                {
+                    Name = thisUser.RealName,
+                    Email = thisUser.Email,
+                    Phone = thisUser.PhoneNumber,
+                    Twitter = thisUser.Twitter,
+                    HasRegistered = externalLogin == null,
+                    LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null,
+                    Contacts = ContactBookController.ToViewModel(thisUser.ContactBook)
+                };
+
+                return Ok(uView);
+            }
+            else
+            {
+                return NotFound();
+            }
+            
         }
 
         ///<summary>Changes user's Email. Eventually it will even require user to confirm it.</summary>
@@ -126,89 +148,7 @@ namespace WebWIthIdentity.Controllers
             return Ok();
         }
 
-        ///<summary>Searches for users based on the array yousubmit. 
-        /// The array is of strings, and can have mixed phone numbers and emails, thiswill be prssesed regardless</summary>
-        /// 
         
-        [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
-        [Route("SearchUsers")]
-        public async Task<IHttpActionResult> SearchUsers(SearchBindingModel model)
-        {
-            SearchViewModel reply = new SearchViewModel();
-            List<ApplicationUser> foundUsers = new List<ApplicationUser>();
-
-            if (model == null)
-                return BadRequest("No Data");
-
-            if (model.SearchContacts.Count == 0)
-                return BadRequest("No Data");
-            if (model.SearchContacts.Count > 1000)
-                return BadRequest("You shall not search more than 1000 users at once, because fuck you");
-            
-
-            foreach (var searchItem in model.SearchContacts)
-            {
-                if (!string.IsNullOrWhiteSpace(searchItem))
-                {
-                    if (searchItem.Length > 5)
-                    {
-                        long phone;
-                        if (Int64.TryParse(searchItem, out phone))
-                        {
-                            var user = await UserManager.Users.FirstOrDefaultAsync(p => p.PhoneNumber == phone);
-                            if (user != null)
-                            {
-                                reply.Found++;
-                                foundUsers.Add(user);
-                            }
-                            else
-                            {
-                                reply.NotFound++; 
-                            }
-                        }
-                        else if(searchItem.Contains("@"))
-                        {
-                            var user = await UserManager.FindByEmailAsync(searchItem);
-                            if (user != null)
-                            {
-                                reply.Found++;
-                                foundUsers.Add(user);
-                            }
-                            else
-                            {
-                                reply.NotFound++;
-                            }
-                        }
-                        else
-                        {
-                            reply.Invalid++;
-                        }
-                    }
-                    else
-                    {
-                        reply.Invalid++;
-                    }
-                }
-                else
-                {
-                    reply.Invalid++;
-                }
-            }
-
-            foreach (ApplicationUser user in foundUsers)
-            {
-                reply.FoundContacts.Add(new OtherUserInfoViewModel
-                {
-                    Phone = user.PhoneNumber,
-                    Name = user.RealName,
-                    Email = user.Email,
-                    ID = Guid.Parse(user.Id)
-                });
-            }
-
-            return Ok(reply);
-        }
-
         // POST api/Account/Logout
         ///<summary>Disregard</summary>
         [Route("Logout")]

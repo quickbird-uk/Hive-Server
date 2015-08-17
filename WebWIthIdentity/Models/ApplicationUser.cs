@@ -35,9 +35,9 @@ namespace WebWIthIdentity.Models
         public string Twitter { get; set; }
 
         /// <summary>
-        /// This is a Contact book, it is a list of people that use the system that the user has saved 
+        /// This is a CBRecord book, it is a list of people that use the system that the user has saved 
         /// </summary>
-        public virtual List<Contact> ContactBook { get; set; }
+        public virtual List<CBRecord> ContactBook { get; set; }
         /// <summary>
         /// The list of farms owned by the person
         /// </summary>
@@ -51,7 +51,7 @@ namespace WebWIthIdentity.Models
         {
             FarmsOwned = new List<Farm>();
             FarmsWorking = new List<Farm>();
-            ContactBook = new List<Contact>();
+            ContactBook = new List<CBRecord>();
         }
 
         /*house Number*/

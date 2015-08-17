@@ -92,17 +92,6 @@ namespace WebWIthIdentity.Models
         public string ProviderKey { get; set; }
     }
 
-    public class SearchBindingModel  
-    {
-        [Required]
-        public virtual List<string> SearchContacts { get; set; }
-
-        public SearchBindingModel()
-        {
-            SearchContacts = new List<string>();
-        }
-
-    }
 
     public class ChangeEmailBindingModel : IValidatableObject
     {

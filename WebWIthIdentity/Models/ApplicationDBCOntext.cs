@@ -11,7 +11,7 @@ namespace WebWIthIdentity.Models
     {
 
         public DbSet<Farm> Farms { get; set; }
-        public DbSet<Contact> ContactBook { get; set; }
+        public DbSet<CBRecord> ContactBook { get; set; }
 
 
         public ApplicationDbContext()
@@ -41,11 +41,12 @@ namespace WebWIthIdentity.Models
                 cs.ToTable("FarmWorkforce");
             });
 
-            modelBuilder.Entity<Contact>().HasKey(p => new { p.OwnerID, p.ConnectionID});
+            modelBuilder.Entity<CBRecord>().HasKey(p => new { p.OwnerID, p.ContactID});
             modelBuilder.Entity<ApplicationUser>().HasMany(p => p.ContactBook).WithRequired(p => p.Owner).WillCascadeOnDelete(false);
-            modelBuilder.Entity<Contact>().HasRequired(p => p.Connection);
-           // modelBuilder.Entity<Contact>()
-            
+            modelBuilder.Entity<CBRecord>().HasRequired(p => p.Contact);
+            modelBuilder.Entity<CBRecord>().ToTable("ContactBook");
+
+
 
         }
 

@@ -19,6 +19,7 @@ namespace WebWIthIdentity.Models
     {
         public string LocalLoginProvider { get; set; }
 
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         public IEnumerable<UserLoginInfoViewModel> Logins { get; set; }
@@ -41,36 +42,16 @@ namespace WebWIthIdentity.Models
         public bool HasRegistered { get; set; }
 
         public string LoginProvider { get; set; }
-    }
 
+       public List<RecordViewModel> Contacts { get; set; }
 
-    public class SearchViewModel
-    {
-        public int Invalid { get; set; }
-        public int NotFound { get; set; }
-        public int Found{ get; set; }
-
-        public SearchViewModel ()
+        public UserInfoViewModel()
         {
-            FoundContacts = new List<OtherUserInfoViewModel>();
+            Contacts = new List<RecordViewModel>();
         }
-
-        public List<OtherUserInfoViewModel> FoundContacts { get; set; }
-}
-
-
-    public class OtherUserInfoViewModel
-    {
-        public string Name { get; set; }
-
-        [DataType(DataType.PhoneNumber)]
-        public long Phone { get; set; }
-
-        [DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
-
-        public Guid ID { get; set; }
     }
+
+
 
     public class UserLoginInfoViewModel
     {

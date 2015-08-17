@@ -109,7 +109,7 @@ namespace WebWIthIdentity.Migrations
                 AllFarms.Add(users[4].FarmsOwned[1]);
                 users[1].FarmsWorking.Add(users[4].FarmsOwned[1]);
 
-               
+
 
                 foreach (var farm in AllFarms)
                 {
@@ -128,16 +128,42 @@ namespace WebWIthIdentity.Migrations
                     }
                             
                 }
+
+                foreach (var user in users)
+                {
+                    user.UserName = user.Id;
+                    user.SecurityStamp = Guid.NewGuid().ToString("D");
+                    user.PasswordHash = passwordHasher.HashPassword("Password1");
+
+                }
+
+                users[1].ContactBook.Add(new CBRecord
+                {
+                    Owner = users[1],
+                    OwnerID = users[1].Id,
+                    Contact = users[0],
+                    ContactID = users[0].Id,
+                    Nickname = users[0].RealName
+                });
+
+                users[1].ContactBook.Add(new CBRecord
+                {
+                    Owner = users[1],
+                    OwnerID = users[1].Id,
+                    Contact = users[3],
+                    ContactID = users[3].Id,
+                    Nickname = users[3].RealName
+                });
+
+
+                foreach (var user in users)
+                {
+                    context.Users.AddOrUpdate(user);
+                }
             }
 
 
-            foreach (var user in users)
-            {
-                user.UserName = user.Id;
-                user.SecurityStamp = Guid.NewGuid().ToString("D");
-                user.PasswordHash = passwordHasher.HashPassword("Password1"); 
-                context.Users.AddOrUpdate(user);
-            }
+
         }
     }
 }
