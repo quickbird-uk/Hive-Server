@@ -28,16 +28,16 @@ namespace WebWIthIdentity.Migrations
             bool emptyDatabase = false;
             string[] crops = {"Corn", "Maise", "Potato", "Nothing", "Wheat", "Rapeseed", "Barley", "Peas", "Oats", "Buckwheat", "Wheat"}; //11 crops to seed the database
 
-            ApplicationUser[] users = new ApplicationUser[5];
-            users[0] = new ApplicationUser
+            List<ApplicationUser> users = new List<ApplicationUser>();
+            users.Add(  new ApplicationUser
             {
                 RealName = "Bob Stone",
                 Twitter = "@Hairy",
                 PhoneNumber = 777777777,
                 Email = "Bob@stoned.uk"
-            };
+            });
 
-            users[1] = new ApplicationUser
+            users.Add( new ApplicationUser
             {
                 RealName = "Winston Churchill",
                 Twitter = "@Churchill",
@@ -48,9 +48,9 @@ namespace WebWIthIdentity.Migrations
                 City = "London",
                 Country = "UK",
                 Postcode = "SW1A 2AA"
-            };
+            });
 
-            users[2] = new ApplicationUser
+            users.Add( new ApplicationUser
             {
                 RealName = "Animesh Mishra",
                 Twitter = "@Thathustlerkid",
@@ -61,17 +61,17 @@ namespace WebWIthIdentity.Migrations
                 City = "Birmingham",
                 Country = "UK",
                 Postcode = "B29 7AA"
-            };
+            });
 
-            users[3] = new ApplicationUser
+            users.Add( new ApplicationUser
             {
                 RealName = "Test Uset",
                 Twitter = "test",
                 PhoneNumber = 545648,
                 Email = "test@test.uk"
-            };
+            });
 
-            users[4] = new ApplicationUser
+            users.Add(new ApplicationUser
             {
                 RealName = "Vladimir Akopyan",
                 Twitter = "@ClumsyPilot",
@@ -82,7 +82,34 @@ namespace WebWIthIdentity.Migrations
                 City = "Birmingham",
                 Country = "UK",
                 Postcode = "B29 6TP"
-            };
+            });
+
+            users.Add(new ApplicationUser
+            {
+                RealName = "Vladimir Akopyan",
+                Twitter = "@ClumsyPilot",
+                PhoneNumber = 7842723489,
+                Email = "vlad@quickbird.uk",
+                HouseNumber = 7,
+                Address1 = "Saunton Way",
+                City = "Birmingham",
+                Country = "UK",
+                Postcode = "B29 6TP"
+            });
+
+
+            users.Add(new ApplicationUser
+            {
+                RealName = "Many",
+                Twitter = "UnknownMonstrosity",
+                PhoneNumber = +44745272505,
+                Email = "manuel@quickbird.uk",
+                HouseNumber = 0,
+                Address1 = "somewhere in a pit",
+                City = "Birmingham",
+                Country = "hell",
+                Postcode = "B29 6TP"
+            });
 
             if (! context.Farms.Any()) //seed if there are no farms 
             {
@@ -137,23 +164,40 @@ namespace WebWIthIdentity.Migrations
 
                 }
 
-                users[1].ContactBook.Add(new CBRecord
-                {
-                    Owner = users[1],
-                    OwnerID = users[1].Id,
-                    Contact = users[0],
-                    ContactID = users[0].Id,
-                    Nickname = users[0].RealName
-                });
+                //generate a list of contacts for each user in the DB
+                foreach (var user in users)
+                {//determine number of contacts the user will have
+                    int nOfContacts = RNG.Next(1, users.Count);
 
-                users[1].ContactBook.Add(new CBRecord
-                {
-                    Owner = users[1],
-                    OwnerID = users[1].Id,
-                    Contact = users[3],
-                    ContactID = users[3].Id,
-                    Nickname = users[3].RealName
-                });
+                    //array that hold indexes for contacts
+                    int[] Contacts = new int[nOfContacts];
+
+                    for(int i=0; i < Contacts.Length; i++)
+                    {
+                        int newValue = RNG.Next(0, users.Count); //generate a random index for the contact 
+                        //we cannot have two links two records point ot he same contact, so they need to be unique
+                        while (Contacts.Contains(newValue))
+                        {
+                            newValue = RNG.Next(0, users.Count);
+                        }
+                        Contacts[i] = newValue; //when we assured that the value does not already exist, we assign it into the array
+                        
+                    }
+                    //Push the records and contacts in
+                    foreach (var contactId in Contacts)
+                    {
+                        user.ContactBook.Add(new CBRecord
+                        {
+                            OwnerID = user.Id,
+                            Owner = user,
+                            Contact = users[contactId],
+                            ContactID = users[contactId].Id,
+                            Nickname = users[contactId].RealName
+                        });
+                    }
+
+                }
+
 
 
                 foreach (var user in users)
