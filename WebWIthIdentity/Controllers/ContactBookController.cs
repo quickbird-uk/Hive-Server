@@ -16,8 +16,7 @@ using WebWIthIdentity.Models;
 
 namespace WebWIthIdentity.Controllers
 {
-    [Authorize]
-    public class ContactBookController : ApiController
+    [Authorize]public class ContactBookController : ApiController
     {
 
         private ApplicationDbContext db = new ApplicationDbContext();

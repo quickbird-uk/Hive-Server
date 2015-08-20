@@ -79,6 +79,10 @@ namespace WebWIthIdentity.Controllers
 
             if (thisUser != null)
             {
+
+                //db.Farms.Where(f => f.Bound.Exists(u => u.PersonID == UserId));
+                //                        .Include(p => p.Bound.Select(u => u.Farm).Select(u => u.Fields)) //Load the fields
+
                 var uView = new UserInfoViewModel
                 {
                     Name = thisUser.RealName,
@@ -89,6 +93,9 @@ namespace WebWIthIdentity.Controllers
                     LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null,
                     Contacts = ContactBookController.ToViewModel(thisUser.ContactBook)
                 };
+
+
+                uView.Farms = await FarmsController.GetUsersFarms(Guid.Parse(UserId), db);
 
                 return Ok(uView);
             }

@@ -6,17 +6,19 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.Http.Results;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using WebWIthIdentity.Models;
+using WebWIthIdentity.Models.FarmData;
 
 
 namespace WebWIthIdentity.Controllers
 {
     [Authorize]
-    public class FarmController : ApiController
+    public class FarmsController : ApiController
     {
 
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -29,65 +31,83 @@ namespace WebWIthIdentity.Controllers
             }
         }
 
-        // GET Farms
+        /// <summary>
+        /// Get a full list of farms that belong to this user
+        /// </summary>
+        /// <returns></returns>
+        [ResponseType(typeof(List<FarmViewModel>))]
         public async Task<IHttpActionResult> Get()
         {
-            
-            var userID = User.Identity.GetUserId();
-
-            
-            var foundfarmsManaged =  await db.Farms.Where(f => f.Managers.Contains(
-                db.Users.Find(userID))).ToListAsync();
-
-            var foundfarmsWorking = await db.Farms.Where(f => f.Crew.Contains(
-               db.Users.Find(userID))).ToListAsync();
-
-            List<FarmViewModel> filtered = new List<FarmViewModel>();
-
-            foreach (var farm in foundfarmsManaged)
-            {
-                if (!farm.disabled)
-                {
-                    filtered.Add(FieldToViewModel(farm, true));
-                }
-            }
-
-            foreach (var farm in foundfarmsWorking)
-            {
-                if (!farm.disabled)
-                {
-                    filtered.Add(FieldToViewModel(farm, false));
-                }
-            }
-
-            return Ok(filtered);
+            var userId = User.Identity.GetUserId();
+            var farmlist = await GetUsersFarms(Guid.Parse(userId), db); 
+        
+            return Ok(farmlist);
         }
 
-        /*
+        internal static async Task<List<FarmViewModel>> GetUsersFarms(Guid userID, ApplicationDbContext db)
+        {
+            var stingGUID = userID.ToString();
+
+            List<FarmViewModel> filtered = new List<FarmViewModel>();
+            
+            var BoundFarms = await db.Bindings.Where(b => b.PersonID == stingGUID) //Get the farms where binding include this person
+                .Include(b => b.Farm.Fields)  //include fields of the farm
+                .Include(f => f.Farm.Bound.Select(p => p.Person))  //include Staff wokring in each farm
+                .ToListAsync();
+
+
+            foreach (var bond in BoundFarms)
+            {
+                filtered.Add((FarmViewModel)bond);
+            }
+
+
+            return filtered;
+        }
+
+        /// <summary>
+        /// Gets details of the spesific farm only
+        /// </summary>
+        /// <param name="farmId"></param>
+        /// <returns></returns>
+        [ResponseType(typeof(FarmViewModel))]
         [Route("Farms/{farmId}")]
-        public IHttpActionResult Get([FromUri] long fieldId)
+        public async Task<IHttpActionResult> Get([FromUri] long farmId)
         {
             var userId = User.Identity.GetUserId();
+            bool exist = await db.Bindings.AnyAsync(p => p.FarmID == farmId);
 
-            var requestedField = db.Farms.Find(fieldId);
-
-            if (requestedField == null)
+            if (!exist)
             {
                 return NotFound();
             }
-            else if (requestedField.ApplicationUserId.Equals(userId))
-            {
-                
-                return Ok(FieldToViewModel(requestedField));
-            }
             else
             {
-                return Unauthorized();
+
+                var foundFarm = await
+                    db.Bindings.Where(b => b.PersonID == userId)
+                        .Where(b => b.FarmID == farmId) //find a bond where he owns this 
+                        .Include(b => b.Farm.Fields) //include fields of the farm
+                        .Include(f => f.Farm.Bound.Select(p => p.Person)) //include Staff wokring in the farm
+                        .FirstOrDefaultAsync();
+
+                if (foundFarm == null)
+                {
+                    return Unauthorized();
+                }
+                else
+                {
+                    return Ok((FarmViewModel)foundFarm);
+                }
             }
 
         }
 
-        
+        /// <summary>
+        /// Creates a new farm for the user
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public async Task<IHttpActionResult> Post([FromBody]FarmBindingModel model)
         {
             if (!ModelState.IsValid)
@@ -100,36 +120,25 @@ namespace WebWIthIdentity.Controllers
             }
             else
             {
+                var UserID = User.Identity.GetUserId();
+                var user = db.Users.Find(UserID);
+
                 var newFarm = new Farm(
-                    model.name,
-                    model.description,
-                    model.longitude ,
-                    model.lattitude
-                );
+                   model.Name,
+                   model.Description
+               );
+                var newBond = new Bond(newFarm, BondType.Owner);
+            
+                user.Bound.Add(newBond);
+                await db.SaveChangesAsync();
 
-                var UserID = User.Identity.GetUserId(); 
-                var userDb =  db.Users.Find(UserID);
-                var userManaged = await UserManager.FindByIdAsync(UserID); 
-
-                if (userDb == null)
-                {
-                    return Unauthorized();
-                }
-                else
-                {
-                    
-                    
-                    userDb.FarmsOwned.Add(newFarm);
-                    userManaged.FarmsOwned.Add(newFarm);
-
-                    await db.SaveChangesAsync();
-                    await UserManager.UpdateAsync(userManaged);
-
-                    return Ok(FieldToViewModel(newFarm));
-                }
+                return Ok();
+                
             }
         }
 
+      
+        /*
         [Route("Farms/{farmId}")]
         public async Task<IHttpActionResult> Put([FromUri]long farmId, [FromBody]FarmBindingModel model)
         {
@@ -199,21 +208,5 @@ namespace WebWIthIdentity.Controllers
         }
         */
 
-
-        internal static FarmViewModel FieldToViewModel(Farm farm, bool owner)
-        {
-            return (new FarmViewModel()
-            {
-                id = farm.Id,
-                name = farm.name,
-                description = farm.description,
-                lattitude = farm.lattitude,
-                longitude = farm.longitude,
-                created = farm.created,
-                lastUpdated = farm.lastUpdated,
-                Owner = owner
-            });
-
-        }
     }
 }

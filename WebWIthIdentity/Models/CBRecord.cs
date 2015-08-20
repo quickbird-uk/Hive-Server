@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Web;
+using WebWIthIdentity.Models.FarmData;
 
 namespace WebWIthIdentity.Models
 {
@@ -25,6 +26,15 @@ namespace WebWIthIdentity.Models
 
         public string Nickname { get; set; }
 
+        /// <summary>
+        ///  
+        /// To use this fucntion, The contact and it's detail must be loaded into memory from SQL database
+        /// </summary>
+        /// <returns>Returns Viewmodel of the contact referred in this CBRecord</returns>
+        public RecordViewModel ViewModel()
+        {
+            return (RecordViewModel)(this); 
+        }
     }
 
     /// <summary> This view model is used to display information of other users. You never can see more detail about other users
@@ -41,11 +51,40 @@ namespace WebWIthIdentity.Models
         /// By default the nickname is the same as the name of each user. If a user renames himself, the nickname does not change </summary>
         public string Nickname { get; set; }
 
+        public BondType Role { get; set; }
+
         [DataType(DataType.PhoneNumber)]
         public long Phone { get; set; }
 
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
+
+        public static explicit operator RecordViewModel(ApplicationUser v)
+        {
+            return new RecordViewModel
+            {
+                ID = Guid.Parse(v.Id),
+                Name = v.RealName,
+                Nickname = string.Empty,
+                Phone = v.PhoneNumber,
+                Email = v.Email,
+                Role = BondType.NotApplicable
+            };
+        }
+
+        public static explicit operator RecordViewModel(CBRecord v)
+        {
+            var viewmodel = (RecordViewModel) v.Contact;
+            v.Nickname = v.Nickname;
+            return viewmodel; 
+        }
+
+        public static explicit operator RecordViewModel(Bond v)
+        {
+            var viewmodel = (RecordViewModel) v.Person;
+            viewmodel.Role = v.Type;
+            return viewmodel; 
+        }
     }
 
     /// <summary> This view model is used to display information of other users. You never can see more detail about other users
@@ -81,6 +120,7 @@ namespace WebWIthIdentity.Models
 
         /// <summary>Number of contacts that where deleted from your contact book/summary>
         public int Removed { get; set; }
+
 
         /// <summary> new list of contacts  </summary>
         public  List<RecordViewModel>  ContactBook { get; set; }

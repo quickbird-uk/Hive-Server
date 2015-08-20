@@ -43,11 +43,14 @@ namespace WebWIthIdentity.Models
 
         public string LoginProvider { get; set; }
 
-       public List<RecordViewModel> Contacts { get; set; }
+        public List<RecordViewModel> Contacts { get; set; }
+
+        public List<FarmViewModel> Farms { get; set; }
 
         public UserInfoViewModel()
         {
             Contacts = new List<RecordViewModel>();
+            Farms = new List<FarmViewModel>();
         }
     }
 

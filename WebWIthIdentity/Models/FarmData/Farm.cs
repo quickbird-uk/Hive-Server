@@ -1,56 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
+using System.Web.UI.WebControls;
 using Microsoft.Owin.BuilderProperties;
+using WebWIthIdentity.Controllers;
 using WebWIthIdentity.Models.FarmData;
 
 namespace WebWIthIdentity.Models
 {
-    public class Farm
+    public class Farm 
     {
 
 
         public Farm()
         {
-            disabled = false;
-            created = DateTime.Now;
-            Managers = new List<ApplicationUser>();
-            Crew = new List<ApplicationUser>();
+            Disabled = false;
+            Created = DateTime.Now;
+            Bound = new List<Bond>();
             Fields = new List<Field>();
         }
 
-        public Farm(string inName, string inDesctiption = "", double inLatt = 0,  double inLong = 0)
+        public Farm(string inName, string inDesctiption = "")
         {
-            name = inName;
-            description = inDesctiption;
-            lattitude = inLatt;
-            longitude = inLong;
-            disabled = false;
-            created = DateTime.Now;
-            lastUpdated = DateTime.Now;
-            Managers = new List<ApplicationUser>();
-            Crew = new List<ApplicationUser>();
+            Name = inName;
+            Description = inDesctiption;
+            Disabled = false;
+            Created = DateTime.Now;
+            LastUpdated = DateTime.Now;
+            Bound = new List<Bond>();
             Fields = new List<Field>();
         }
 
-        [Key]
+
         public long Id { get; set; }
 
-        public virtual List<ApplicationUser> Managers { get; set; }
-        public virtual List<ApplicationUser> Crew { get; set; }
+        public virtual List<Bond> Bound { get; set; }
+
 
         public virtual List<Field> Fields { get; set; }
 
-        public String name { get; set; }
-        public String description { get; set; }
-        public double lattitude { get; set; }
-        public double longitude { get; set; }
-        public DateTime created { get; set; }
-        public DateTime lastUpdated { get; set; }
+        public String Name { get; set; }
+        public String Description { get; set; }
+
+        public DateTime Created { get; set; }
+        public DateTime LastUpdated { get; set; }
 
 
         /*house Number*/
@@ -68,48 +68,114 @@ namespace WebWIthIdentity.Models
         public String Postcode { get; set; } //Not Null
 
 
+        public bool Disabled { get; set; }
 
-        public bool disabled { get; set; }
+
+        public List<ApplicationUser> Owners()
+        {
+            return SelectBonds(BondType.Owner);
+        }
+
+    
+        public List<ApplicationUser> Managers()
+        {
+            return SelectBonds(BondType.Manager);
+        }
+
+
+        public List<ApplicationUser> Agronomists()
+        {
+            return SelectBonds(BondType.Agrinomist);
+        }
+
+
+        public List<ApplicationUser> Crew()
+        {
+            return SelectBonds(BondType.Crew);
+        }
+
+        /// <summary>  Gets all the people working on this farm  </summary>
+        public List<ApplicationUser> getAllPeople()
+        {
+            return SelectBonds();
+        }
+
+        private List<ApplicationUser> SelectBonds(BondType selectBondType = BondType.Any)
+        {
+            List<ApplicationUser> people = new List<ApplicationUser>();
+            foreach (var bond in Bound)
+            {
+                if (bond.Type == selectBondType)
+                {
+                   people.Add(bond.Person);
+                }
+                else if (selectBondType == BondType.Any)
+                {
+                    people.Add(bond.Person);
+                }
+            }
+            return people;
+        }
 
     }
 
     public class FarmBindingModel
     {
         [Required]
-        [Display(Name = "FieldName")]
-        public string name { get; set; }
+        [Display(Name = "Name")]
+        public string Name { get; set; }
 
 
         [DataType(DataType.MultilineText)]
         [Display(Name = "FieldDescription")]
-        public string description { get; set; }
-
-        [Display(Name = "Longitude")]
-        public double longitude { get; set; }
-
-
-        [Display(Name = "Lattitude")]
-        public double lattitude { get; set; }
+        public string Description { get; set; }
 
     }
 
 
     public class FarmViewModel
     {
-        public long id { get; set; }
+        public long Id { get; set; }
 
-        public String name { get; set; }
+        public String Name { get; set; }
 
-        public String description { get; set; }
+        public String Description { get; set; }
 
-        public double longitude { get; set; }
+        public BondType bondType { get; set; }
 
-        public double lattitude { get; set; }
+        public DateTime Created { get; set; }
 
-        public DateTime created { get; set; }
+        public DateTime LastUpdated { get; set; }
 
-        public DateTime lastUpdated { get; set; }
+        public List<FieldViewModel> Fields { get; set; }
         
-        public bool Owner { get; set; }
+        public List<RecordViewModel> Staff { get; set; }
+
+        public static explicit operator FarmViewModel(Bond v)
+        {
+            var toReturn = new FarmViewModel
+            {
+                Id = v.Farm.Id,
+                Name = v.Farm.Name,
+                Description = v.Farm.Description,
+                Created = v.Created,
+                LastUpdated = v.Farm.LastUpdated,
+                Fields = new List<FieldViewModel>(),
+                Staff = new List<RecordViewModel>(),
+                bondType = v.Type
+            };
+
+            foreach (var field in v.Farm.Fields)
+            {
+                toReturn.Fields.Add((FieldViewModel) field);
+            }
+
+            foreach (var bond in v.Farm.Bound)
+            {
+                toReturn.Staff.Add((RecordViewModel)bond);
+            }
+
+            return toReturn;
+        }
     }
 }

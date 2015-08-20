@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
+using WebWIthIdentity.Models.FarmData;
 
 namespace WebWIthIdentity.Models
 {
@@ -39,18 +40,30 @@ namespace WebWIthIdentity.Models
         /// </summary>
         public virtual List<CBRecord> ContactBook { get; set; }
         /// <summary>
-        /// The list of farms owned by the person
+        /// The list of farms the person is related to
         /// </summary>
-        public virtual List<Farm> FarmsOwned { get; set; }
-        /// <summary>
-        /// The list of farms where the person works
-        /// </summary>
-        public virtual List<Farm> FarmsWorking { get; set; }
+        public virtual List<Bond> Bound { get; set; }
+
+        public List<Farm> FarmsOwned(){
+            return SelectFarms(BondType.Owner);
+        }
+
+        public List<Farm> FarmsManaged() {
+                return SelectFarms(BondType.Manager);
+        }
+
+        public List<Farm> FarmsConsulted(){
+                return SelectFarms(BondType.Agrinomist);
+        }
+
+        public List<Farm> FarmsWorked(){
+                return SelectFarms(BondType.Crew);
+        }
+
 
         public ApplicationUser() 
         {
-            FarmsOwned = new List<Farm>();
-            FarmsWorking = new List<Farm>();
+            Bound = new List<Bond>();
             ContactBook = new List<CBRecord>();
         }
 
@@ -58,15 +71,15 @@ namespace WebWIthIdentity.Models
         public int HouseNumber { get; set; }
 
         /*three lines for address, one should be mandatory*/
-        public String Address1 { get; set; } //Not Null
-        public String Address2 { get; set; }
-        public String Address3 { get; set; }
+        public string Address1 { get; set; } //Not Null
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
 
-        public String City { get; set; } //Not Null
+        public string City { get; set; } //Not Null
 
-        public String Country { get; set; } //Not Null
+        public string Country { get; set; } //Not Null
 
-        public String Postcode { get; set; } //Not Null
+        public string Postcode { get; set; } //Not Null
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
         {
@@ -76,6 +89,23 @@ namespace WebWIthIdentity.Models
             
             // Add custom user claims here
             return userIdentity;
+        }
+
+        private List<Farm> SelectFarms (BondType selectBondType)
+        {
+            List<Farm> selectedFarms = new List<Farm>();
+            foreach (var bond in Bound)
+            {
+                if(bond.Type == selectBondType)
+                { selectedFarms.Add(bond.Farm);}
+            }
+            return selectedFarms;
+        }
+
+        public RecordViewModel ViewModel()
+        {
+            return (RecordViewModel) this; 
+
         }
     }
 
