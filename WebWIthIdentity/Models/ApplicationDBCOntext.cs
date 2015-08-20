@@ -16,11 +16,13 @@ namespace WebWIthIdentity.Models
         public DbSet<CBRecord> ContactBook { get; set; }
         public DbSet<Bond> Bindings { get; set; }
 
+        public DbSet<Field> Fields { get; set; }
+
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
-            Configuration.LazyLoadingEnabled = false;
+            Configuration.LazyLoadingEnabled = true;
 
         }
 

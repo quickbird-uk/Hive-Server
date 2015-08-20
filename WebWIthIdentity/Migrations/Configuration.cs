@@ -109,8 +109,7 @@ namespace WebWIthIdentity.Migrations
                     var bond = new Bond
                     {
                         Type = BondType.Owner,
-                        Farm = farm,
-                        Accepted = true
+                        Farm = farm
                     };
 
                     context.Farms.Add(farm);
@@ -127,8 +126,7 @@ namespace WebWIthIdentity.Migrations
                         users[2].Bound.Add(new Bond
                         {
                             Farm = user.FarmsOwned()[0],
-                            Type = BondType.Agrinomist,
-                            Accepted = true
+                            Type = BondType.Agrinomist
                         });
                     }
                 }
@@ -138,26 +136,22 @@ namespace WebWIthIdentity.Migrations
                     users[0].Bound.Add(new Bond
                     {
                         Farm = users[4].FarmsOwned()[0],
-                        Type = BondType.Crew,
-                        Accepted = true
+                        Type = BondType.Crew
                     });
                     users[1].Bound.Add(new Bond
                     {
                         Farm = users[4].FarmsOwned()[0],
-                        Type = BondType.Crew,
-                        Accepted = true
+                        Type = BondType.Crew
                     });
                     users[5].Bound.Add(new Bond
                     {
                         Farm = users[4].FarmsOwned()[0],
-                        Type = BondType.Manager,
-                        Accepted = true
+                        Type = BondType.Manager
                     });
                     users[3].Bound.Add(new Bond
                     {
                         Farm = users[4].FarmsOwned()[0],
-                        Type = BondType.Crew,
-                        Accepted = true
+                        Type = BondType.Crew
                     });
                 }
 

@@ -50,7 +50,7 @@ namespace WebWIthIdentity.Controllers
 
             List<FarmViewModel> filtered = new List<FarmViewModel>();
             
-            var BoundFarms = await db.Bindings.Where(b => b.PersonID == stingGUID) //Get the farms where binding include this person
+            var BoundFarms = await db.Bindings.Where(b => b.PersonID == stingGUID && ! b.Farm.Disabled) //Get the farms where binding include this person
                 .Include(b => b.Farm.Fields)  //include fields of the farm
                 .Include(f => f.Farm.Bound.Select(p => p.Person))  //include Staff wokring in each farm
                 .ToListAsync();
@@ -86,7 +86,7 @@ namespace WebWIthIdentity.Controllers
 
                 var foundFarm = await
                     db.Bindings.Where(b => b.PersonID == userId)
-                        .Where(b => b.FarmID == farmId) //find a bond where he owns this 
+                        .Where(b => b.FarmID == farmId && ! b.Farm.Disabled ) //find a bond where he owns this 
                         .Include(b => b.Farm.Fields) //include fields of the farm
                         .Include(f => f.Farm.Bound.Select(p => p.Person)) //include Staff wokring in the farm
                         .FirstOrDefaultAsync();
@@ -137,8 +137,12 @@ namespace WebWIthIdentity.Controllers
             }
         }
 
-      
-        /*
+      /// <summary>
+      /// Updates an existing farm. It must belong to the user. 
+      /// </summary>
+      /// <param name="farmId"></param>
+      /// <param name="model"></param>
+      /// <returns></returns>
         [Route("Farms/{farmId}")]
         public async Task<IHttpActionResult> Put([FromUri]long farmId, [FromBody]FarmBindingModel model)
         {
@@ -153,60 +157,92 @@ namespace WebWIthIdentity.Controllers
             else
             {
                 var userId = User.Identity.GetUserId();
+                var user = db.Users.Find(userId);
 
-                var editedField = db.Farms.Find(farmId);
+                List<Bond> bindings = await db.Bindings.Where(b => b.FarmID == farmId &&!  b.Farm.Disabled )
+                    .ToListAsync();
 
-                if (editedField == null)
+                if (bindings.Count == 0)
                 {
-                    return NotFound();
-                }
-                else if (editedField.ApplicationUserId.Equals(userId))
-                {
-                    editedField.name = model.name;
-                    if (model.description?.Length > 0)
-                        editedField.description = model.description;
-                    if (model.longitude != 0 && model.lattitude != 0)
-                    {
-                        editedField.lattitude = model.lattitude;
-                        editedField.longitude = model.longitude; 
-                    }
-                    
-                    await db.SaveChangesAsync();
-
-                    return Ok(FieldToViewModel(editedField));
-                    
+                    return NotFound(); //this farm does not exist
                 }
                 else
                 {
-                    return Unauthorized();
+                    Bond bond = bindings.FirstOrDefault(p => p.PersonID == userId);
+                    if (bond == null)
+                    {
+                        return Unauthorized(); //user is not attached to this farm
+                    }
+                    else if (bond.Type != BondType.Manager && bond.Type != BondType.Owner)
+                    {
+                        return Unauthorized(); //user is not authorised to make changes to this farm
+                    }
+                    else
+                    {//user is authorised, make nessesary changes! 
+                        var farm = bond.Farm;
+                        if (!string.IsNullOrWhiteSpace(model.Name))
+                        { farm.Name = model.Name;}
+                        if (!string.IsNullOrWhiteSpace(model.Description))
+                        { farm.Description = model.Description;}
+
+                        await db.SaveChangesAsync();
+                        return Ok();
+                    }
                 }
+
             }
         }
 
+
+        /// <summary>
+        /// Removes the required farm completely 
+        /// </summary>
+        /// <param name="farmId"></param>
+        /// <returns></returns>
         [Route("Farms/{farmId}")]
         public async Task<IHttpActionResult> Delete([FromUri]long farmId)
         {
             var userId = User.Identity.GetUserId();
+            var user = db.Users.Find(userId);
 
-            var editedField = db.Farms.Find(farmId);
+            List<Bond> bindings = await db.Bindings.Where(b => b.FarmID == farmId && ! b.Farm.Disabled)
+                .ToListAsync();
 
-            if (editedField == null)
+            if (bindings.Count == 0)
             {
-                return NotFound();
-            }
-            else if (editedField.ApplicationUserId.Equals(userId))
-            {
-                editedField.disabled = true; 
-                await db.SaveChangesAsync();
-
-                return Ok();
+                return NotFound(); //this farm does not exist
             }
             else
             {
-                return Unauthorized();
+                Bond bond = bindings.FirstOrDefault(p => p.PersonID == userId);
+                if (bond == null)
+                {
+                    return Unauthorized(); //user is not attached to this farm
+                }
+                else if (bond.Type != BondType.Owner)
+                {
+                    return Unauthorized(); //user is not authorised to delete this farm
+
+                }
+                else
+                {
+                    //Cut this person's connection with the farm
+                    if (bond.Farm.Fields.Exists(p => ! p.Disabled) && bond.Farm.Fields.Count > 0)
+                    {
+                        return BadRequest("You cannot delete the farm as long as there are still fields attached to it"); 
+                    }
+                    else
+                    {
+                        bond.Farm.Disabled = true; 
+                        await db.SaveChangesAsync();
+                        return Ok();
+                    }
+
+                }
             }
         }
-        */
+        
+        
 
     }
 }

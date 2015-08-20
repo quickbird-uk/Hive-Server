@@ -167,7 +167,8 @@ namespace WebWIthIdentity.Models
 
             foreach (var field in v.Farm.Fields)
             {
-                toReturn.Fields.Add((FieldViewModel) field);
+                if(! field.Disabled) //only if field is not disabled
+                { toReturn.Fields.Add((FieldViewModel) field);}
             }
 
             foreach (var bond in v.Farm.Bound)

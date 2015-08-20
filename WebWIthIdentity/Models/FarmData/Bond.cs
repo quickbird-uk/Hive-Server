@@ -39,7 +39,6 @@ namespace WebWIthIdentity.Models.FarmData
 
         public BondType Type { get; set; }
         
-        public bool Accepted { get; set; }
     }
 
     /// <summary> Explains the relationship between the person and the farm. THere are Mangers, Agronomists and Crew. ALl have different privilages.  </summary>
