@@ -34,6 +34,10 @@ namespace HiveServer.Models
 
         public string LastName { get; set; }
 
+        public byte[] OTPSalt { get; set; }
+
+        public DateTime LastSMSCode { get; set; }
+
         /// <summary>
         /// The list of farms the person is related to
         /// </summary>
@@ -42,10 +46,15 @@ namespace HiveServer.Models
 
         public ApplicationUser() 
         {
+            LastSMSCode = DateTime.UtcNow;
             Bound = new List<BondDb>();
         }
 
-     
+        public void updateLastSMSCode()
+        {
+            LastSMSCode = DateTime.UtcNow; 
+        }
+
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser, long> manager, string authenticationType)
         {

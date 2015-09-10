@@ -426,7 +426,8 @@ namespace HiveServer.Controllers
                 {
                     PhoneNumber = model.phone,
                     FirstName = model.firstName,
-                    LastName = model.lastName,                   
+                    LastName = model.lastName, 
+                    OTPSalt = Base.LoginUtils.generateSalt()
 
                 }; //create user
 
@@ -440,6 +441,9 @@ namespace HiveServer.Controllers
                     // Could also be before try if you know the exception occurs in SaveChanges
 
                     result = await UserManager.CreateAsync(user, model.Password);
+
+                    string otp = Base.LoginUtils.GenerateOTP5min(user);
+                    await SMSService.SendMessage(model.phone.ToString(), "Welcome to Hive, your code is " + otp + " use it to confirm your phone number within 5 min");
                 }
                 catch (DbEntityValidationException e)
                 {

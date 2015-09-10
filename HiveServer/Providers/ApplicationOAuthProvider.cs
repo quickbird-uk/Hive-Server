@@ -11,6 +11,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
 using HiveServer.Models;
+using System.Text.RegularExpressions;
 
 namespace HiveServer.Providers
 {
@@ -45,7 +46,7 @@ namespace HiveServer.Providers
             {
                 user = await userManager.FindByEmailAsync(identifier);
             } 
-            else if ( phone > 10000) //it could be a phone number! 
+            else if ( phone > 1000000000) //it could be a phone number! 
             {
                 user = await userManager.Users.Where(p => p.PhoneNumber == phone).FirstOrDefaultAsync(); 
             }
@@ -54,19 +55,48 @@ namespace HiveServer.Providers
             //user = await userManager.FindAsync(context.UserName, context.Password); //finds the user
             if (user != null)
             {
-                string providedPWD = context.Password ?? string.Empty;
-                var result = userManager.PasswordHasher.VerifyHashedPassword(user.PasswordHash, providedPWD);
-
-                if (result.Equals(PasswordVerificationResult.Success)) //user provided correct creentials
+                if (! string.IsNullOrWhiteSpace(context.Password)) //check if valid password was provided
                 {
-                    ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(userManager, //generates identity
-                     OAuthDefaults.AuthenticationType);
+                    bool loggedIn = false;//did user log in succesfully 
 
-                    AuthenticationProperties properties = CreateProperties(user.UserName); //generates properties
+                    var result = userManager.PasswordHasher.VerifyHashedPassword(user.PasswordHash, context.Password);  //check if password was correct
 
-                    AuthenticationTicket ticket = new AuthenticationTicket(oAuthIdentity, properties); //puts properties and idenity into authentication ticket
+                    if (result.Equals(PasswordVerificationResult.Success)) //user provided correct creentials
+                    {
+                        if(user.PhoneNumberConfirmed)
+                        { loggedIn = true; } //only allow user to login with password if their phone was confirmed
+                    }
+                    else if (! loggedIn)
+                    {
+                        string serverOtp = Regex.Replace(Base.LoginUtils.GenerateOTP5min(user), @"\s+", "");
+                        string clientOtp = Regex.Replace(context.Password, @"\s+", "");
 
-                    context.Validated(ticket);
+                        if (! user.PhoneNumberConfirmed) //if the user's phone number is not confirmed, set it as confirmed
+                        {
+                            user.PhoneNumberConfirmed = true;  
+                            await userManager.UpdateAsync(user); 
+                        }
+                        loggedIn = Base.LoginUtils.slowEquals(serverOtp, clientOtp);
+                    }
+
+
+
+
+                    if (loggedIn) //user provided correct creentials
+                    {
+                        ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(userManager, //generates identity
+                         OAuthDefaults.AuthenticationType);
+
+                        AuthenticationProperties properties = CreateProperties(user.UserName); //generates properties
+
+                        AuthenticationTicket ticket = new AuthenticationTicket(oAuthIdentity, properties); //puts properties and idenity into authentication ticket
+
+                        context.Validated(ticket);
+                    }
+                    else
+                    {
+                        context.SetError("invalid_grant", "The user name or password is incorrect."); //rejects, password is wrong
+                    }
                 }
                 else
                 {
