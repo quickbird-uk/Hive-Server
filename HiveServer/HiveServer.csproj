@@ -175,6 +175,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\LoginUtils.cs" />
+    <Compile Include="Base\Utils.cs" />
+    <Compile Include="Controllers\ContactsController.cs" />
+    <Compile Include="DTO\Account\SMSRequest.cs" />
     <Compile Include="SMSService.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -216,7 +219,6 @@
     <Compile Include="DTO\Account\Account.cs" />
     <Compile Include="Base\Address.cs" />
     <Compile Include="DTO\Contact.cs" />
-    <Compile Include="DTO\Account\CustomLoginResult.cs" />
     <Compile Include="DTO\ErrorResponce.cs" />
     <Compile Include="DTO\Farm.cs" />
     <Compile Include="DTO\Field.cs" />

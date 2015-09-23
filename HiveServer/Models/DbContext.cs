@@ -28,6 +28,13 @@ namespace HiveServer.Models
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ApplicationUser>().Property(i => i.LastName).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<ApplicationUser>().Property(i => i.FirstName).IsRequired().HasMaxLength(100);            
+            modelBuilder.Entity<ApplicationUser>().Property(i => i.OTPSecret).IsRequired().HasMaxLength(256);
+            modelBuilder.Entity<ApplicationUser>().Property(i => i.PhoneNumber).HasColumnAnnotation(IndexAnnotation.AnnotationName,
+            new IndexAnnotation(new IndexAttribute("IX_PhoneNumber", 1) { IsUnique = true })); 
+
+
             //COnfigure the User-Farm Bound
             modelBuilder.Entity<ApplicationUser>().ToTable("People");
             modelBuilder.Entity<ApplicationUser>().HasMany(p => p.Bound).WithRequired(p => p.Person);

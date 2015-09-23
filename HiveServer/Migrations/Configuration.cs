@@ -31,16 +31,16 @@ namespace HiveServer.Migrations
             List<ApplicationUser> users = new List<ApplicationUser>();
             users.Add(new ApplicationUser
             {
-                FirstName = "Bob Stone",
-
+                FirstName = "Bob",
+                LastName = "Stone",
                 PhoneNumber = 777777777,
    
             });
 
             users.Add(new ApplicationUser
             {
-                FirstName = "Winston Churchill",
-
+                FirstName = "Winston",
+                LastName = "Chirchill", 
                 PhoneNumber = 666666,
                 Email = "win@uk",
 
@@ -48,24 +48,24 @@ namespace HiveServer.Migrations
 
             users.Add(new ApplicationUser
             {
-                FirstName = "Animesh Mishra",
-
+                FirstName = "Animesh",
+                LastName = "Mishra",
                 PhoneNumber = 7796604116,
 
             });
 
             users.Add(new ApplicationUser
             {
-                FirstName = "Test User",
-
+                FirstName = "Test",
+                LastName = "User",
                 PhoneNumber = 545648,
                 Email = "test@test.uk"
             });
 
             users.Add(new ApplicationUser
             {
-                FirstName = "Vladimir Akopyan",
-
+                FirstName = "Vladimir",
+                LastName = "Akopyan",
                 PhoneNumber = 7842723489,
                 Email = "vlad@quickbird.uk",
 
@@ -74,6 +74,7 @@ namespace HiveServer.Migrations
             users.Add(new ApplicationUser
             {
                 FirstName = "Manuel",
+                LastName = "Sanabria",
                 PhoneNumber = +44745272505,
                 Email = "manuel@quickbird.uk",
 
@@ -164,7 +165,7 @@ namespace HiveServer.Migrations
                     user.UserName = Guid.NewGuid().ToString(); 
                     user.SecurityStamp = Guid.NewGuid().ToString("D");
                     user.PasswordHash = passwordHasher.HashPassword("Password1");
-
+                    user.OTPSecret = Base.LoginUtils.generateSalt();
                 }
 
                 //generate a list of contacts for each user in the DB

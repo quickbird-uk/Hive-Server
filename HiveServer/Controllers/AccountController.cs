@@ -23,6 +23,8 @@ using HiveServer.Models;
 using HiveServer.Providers;
 using HiveServer.Results;
 using HiveServer.DTO;
+using HiveServer.Base;
+using System.Net;
 
 namespace HiveServer.Controllers
 {
@@ -351,7 +353,7 @@ namespace HiveServer.Controllers
                 ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager,
                     CookieAuthenticationDefaults.AuthenticationType);
 
-                AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.UserName);
+                AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.Id);
                 Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
             }
             else
@@ -409,68 +411,93 @@ namespace HiveServer.Controllers
         ///<summary>Creates a new user with Local authentication</summary>
         [AllowAnonymous]
         [Route("Register")]  
-        public async Task<IHttpActionResult> Register(RegistrationRequest model)
+        public async Task<dynamic> Register(RegistrationRequest model)
         {
-            if (!ModelState.IsValid)
+            HttpResponseMessage responce = Utils.CheckModel(model, Request);
+            if (!responce.IsSuccessStatusCode)
+                return responce;
+
+            var user = new ApplicationUser()
             {
-                return BadRequest(ModelState);
+                PhoneNumber = model.phone,
+                FirstName = model.firstName,
+                LastName = model.lastName, 
+                OTPSecret = Base.LoginUtils.generateSalt()
+
+            }; //create user
+
+            user.UserName = Guid.NewGuid().ToString(); //give the USername a value, for soem reason
+
+            IdentityResult result =  new IdentityResult(); 
+
+            try
+            {
+                // Your code...
+                // Could also be before try if you know the exception occurs in SaveChanges
+
+                result = await UserManager.CreateAsync(user, model.Password);
+
             }
-            if (model == null)
+            catch (Exception original)
             {
-                return BadRequest("You sent no data");
+                Exception innermost = original; 
+
+                while(innermost.InnerException != null)
+                {
+                    innermost = innermost.InnerException; 
+                }
+                if(innermost.GetType() == typeof(System.Data.SqlClient.SqlException)) // true)
+                {
+                    var sqlException = (System.Data.SqlClient.SqlException)innermost;
+
+                    if (sqlException.Number == 2601)
+                        return ErrorResponse.PhoneTaken;
+
+                }
+                return innermost; 
+            }
+
+            if (result.Succeeded)
+            {
+                string otp = Base.LoginUtils.GenerateOTP(user);
+                await SMSService.SendMessage(model.phone.ToString(), "Welcome to Hive, your code is " + otp + " use it to confirm your phone number within 5 min");
+                return responce;
             }
             else
             {
-                
-                var user = new ApplicationUser()
-                {
-                    PhoneNumber = model.phone,
-                    FirstName = model.firstName,
-                    LastName = model.lastName, 
-                    OTPSalt = Base.LoginUtils.generateSalt()
-
-                }; //create user
-
-                user.UserName = Guid.NewGuid().ToString(); //give the USername a value, for soem reason
-
-                IdentityResult result =  new IdentityResult(); 
-
-                try
-                {
-                    // Your code...
-                    // Could also be before try if you know the exception occurs in SaveChanges
-
-                    result = await UserManager.CreateAsync(user, model.Password);
-
-                    string otp = Base.LoginUtils.GenerateOTP5min(user);
-                    await SMSService.SendMessage(model.phone.ToString(), "Welcome to Hive, your code is " + otp + " use it to confirm your phone number within 5 min");
-                }
-                catch (DbEntityValidationException e)
-                {
-                    foreach (var eve in e.EntityValidationErrors)
-                    {
-                        ModelState.AddModelError("Entity of type " 
-                            + eve.Entry.Entity.GetType().Name, "in state " + eve.Entry.State + " has the following validation errors");
-
-                        foreach (var ve in eve.ValidationErrors)
-                        {
-                            ModelState.AddModelError(ve.PropertyName, ve.ErrorMessage);
-                        }
-                    }
-                }
-                    
-
-                if (!result.Succeeded)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                return Ok();
-                
-
+                return ErrorResponse.SomethingHappened; 
             }
-            
+                        
         }
+
+        
+        /// <summary> Allows the user to request an SMS code, taht will be valid for 5 minutes to sign in</summary>
+        /// <param name="model"></param>
+        /// <returns>Returns OK or Badrequest</returns>
+        [ResponseType(typeof(bool))]
+        [AllowAnonymous]
+        [Route("RequestSMSCode")]
+        public async Task<dynamic> RequestSMSCode(SMSRequest model)
+        {            
+            HttpResponseMessage responce = Utils.CheckModel(model, Request);
+            if (!responce.IsSuccessStatusCode)
+                return responce; 
+
+            ApplicationUser user = await LoginUtils.findByIdentifierAsync(model.phone.ToString(), UserManager);
+
+            if(user == null || ! String.Equals(user.LastName, model.lastName, StringComparison.OrdinalIgnoreCase)) //if the user does not exist, or if their last name does not match phone number
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, ErrorResponse.CantLogin);
+            }
+            else 
+            {
+                string otp = Base.LoginUtils.GenerateOTP(user);
+                await SMSService.SendMessage(model.phone.ToString(), String.Format("Your SMS code is {0} use it to login within {1} min" , otp, LoginUtils.Interval / 60));
+            }
+
+            return responce; 
+        }
+
 
         // POST api/Account/RegisterExternal
         ///<summary>Disregard</summary>

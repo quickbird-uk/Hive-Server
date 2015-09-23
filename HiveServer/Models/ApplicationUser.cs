@@ -17,7 +17,7 @@ namespace HiveServer.Models
     public class ApplicationUser : IdentityUser<long, CustomUserLogin, CustomUserRole, CustomUserClaim>
     {
 
-        [Index(IsUnique = false)]
+       
         new public long PhoneNumber
         {
             get
@@ -34,9 +34,7 @@ namespace HiveServer.Models
 
         public string LastName { get; set; }
 
-        public byte[] OTPSalt { get; set; }
-
-        public DateTime LastSMSCode { get; set; }
+        public byte[] OTPSecret { get; set; }
 
         /// <summary>
         /// The list of farms the person is related to
@@ -46,13 +44,7 @@ namespace HiveServer.Models
 
         public ApplicationUser() 
         {
-            LastSMSCode = DateTime.UtcNow;
             Bound = new List<BondDb>();
-        }
-
-        public void updateLastSMSCode()
-        {
-            LastSMSCode = DateTime.UtcNow; 
         }
 
 
