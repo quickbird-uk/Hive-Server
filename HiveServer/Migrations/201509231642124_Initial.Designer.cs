@@ -13,12 +13,12 @@ namespace HiveServer.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201509101320112_Initial"; }
+            get { return "201509231642124_Initial"; }
         }
         
         string IMigrationMetadata.Source
         {
-            get { return null; }
+            get { return Resources.GetString("Source"); }
         }
         
         string IMigrationMetadata.Target

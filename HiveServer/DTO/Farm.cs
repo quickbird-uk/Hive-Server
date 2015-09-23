@@ -27,7 +27,7 @@ namespace HiveServer.DTO
                 UpdatedAt = v.Farm.UpdatedAt,
                 role = v.Role,
                 Version = v.Version,
-                Deleted = v.Deleted
+                Deleted = v.Farm.Deleted
             };
             return result;
         }

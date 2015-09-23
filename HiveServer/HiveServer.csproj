@@ -176,8 +176,14 @@
   <ItemGroup>
     <Compile Include="Base\LoginUtils.cs" />
     <Compile Include="Base\Utils.cs" />
+    <Compile Include="Controllers\StaffController.cs" />
+    <Compile Include="Controllers\FarmsController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="DTO\Account\SMSRequest.cs" />
+    <Compile Include="Migrations\201509231642124_Initial.cs" />
+    <Compile Include="Migrations\201509231642124_Initial.Designer.cs">
+      <DependentUpon>201509231642124_Initial.cs</DependentUpon>
+    </Compile>
     <Compile Include="SMSService.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -228,10 +234,6 @@
     <Compile Include="DTO\Staff.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201509101320112_Initial.cs" />
-    <Compile Include="Migrations\201509101320112_Initial.Designer.cs">
-      <DependentUpon>201509101320112_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="DTO\Account\AccountBindingModels.cs" />
@@ -323,8 +325,8 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201509101320112_Initial.resx">
-      <DependentUpon>201509101320112_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201509231642124_Initial.resx">
+      <DependentUpon>201509231642124_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

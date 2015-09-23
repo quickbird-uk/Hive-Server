@@ -165,6 +165,6 @@ namespace HiveServer.Controllers
             }
 
             return Request.CreateResponse(HttpStatusCode.BadRequest, peopleDTO);
-        }
+        } 
     }
 }
