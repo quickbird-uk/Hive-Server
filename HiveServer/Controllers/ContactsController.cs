@@ -1,4 +1,5 @@
-﻿using HiveServer.DTO;
+﻿using HiveServer.Base;
+using HiveServer.DTO;
 using HiveServer.Models;
 using Microsoft.AspNet.Identity;
 using System;
@@ -27,8 +28,7 @@ namespace HiveServer.Controllers
             var UserId = long.Parse(User.Identity.GetUserId());
 
             var Contacts =
-                await
-                    db.Contacts.Where(p => p.Person1Id == UserId || p.Person2Id == UserId).ToListAsync();
+                await db.Contacts.Where(p => p.Person1Id == UserId || p.Person2Id == UserId).ToListAsync();
 
             List <DTO.Contact> result = new List<DTO.Contact>();
 
@@ -48,6 +48,8 @@ namespace HiveServer.Controllers
         /// <param name="contactID">returns 200 if successfull, or will reply if unsuccessfull</param>
         public async Task<dynamic> Post([FromBody]long contactID)
         {
+
+
             var UserId = long.Parse(User.Identity.GetUserId());
 
             bool exists = await db.Contacts.AnyAsync(
@@ -83,6 +85,10 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Put([FromUri] long id, [FromBody]Contact contactWeb)
         {
             var UserId = long.Parse(User.Identity.GetUserId());
+
+            HttpResponseMessage responce = Utils.CheckModel(contactWeb, Request);
+            if (!responce.IsSuccessStatusCode)
+                return responce;
 
             var contactDb = await db.Contacts.FirstOrDefaultAsync(
                         p => (p.Person1Id == UserId && p.Id == id)

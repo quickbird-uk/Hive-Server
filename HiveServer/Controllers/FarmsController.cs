@@ -1,4 +1,5 @@
-﻿using HiveServer.DTO;
+﻿using HiveServer.Base;
+using HiveServer.DTO;
 using HiveServer.Models;
 using Microsoft.AspNet.Identity;
 using System;
@@ -25,7 +26,7 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Get()
         {
             var UserId = long.Parse(User.Identity.GetUserId());
-
+            
             List<Models.FarmData.BondDb> relevantFarms = await db.Bindings.Where(f => f.PersonID == UserId).ToListAsync();
             List<Farm> farmsDTO = new List<Farm>();
 
@@ -45,6 +46,10 @@ namespace HiveServer.Controllers
         /// <param name="contactID">returns 200 if successfull, or ErrorResponce</param>
         public async Task<dynamic> Post([FromBody] Farm newFarm)
         {
+            HttpResponseMessage responce = Utils.CheckModel(newFarm, Request);
+            if (!responce.IsSuccessStatusCode)
+                return responce;
+
             var UserId = long.Parse(User.Identity.GetUserId());
 
             FarmDb farmDb = new FarmDb
@@ -76,7 +81,11 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Put([FromUri] long id, [FromBody] Farm newFarm)
         {
             var UserId = long.Parse(User.Identity.GetUserId());
-            
+
+            HttpResponseMessage responce = Utils.CheckModel(newFarm, Request);
+            if (!responce.IsSuccessStatusCode)
+                return responce;
+
             var farmBinding = await db.Bindings.Where(b => b.PersonID == UserId && b.FarmID == id ).Include( f => f.Farm).FirstOrDefaultAsync(); 
 
             if(farmBinding == null)

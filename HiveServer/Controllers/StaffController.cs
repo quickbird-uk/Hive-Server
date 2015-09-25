@@ -1,4 +1,5 @@
-﻿using HiveServer.DTO;
+﻿using HiveServer.Base;
+using HiveServer.DTO;
 using HiveServer.Models;
 using HiveServer.Models.FarmData;
 using Microsoft.AspNet.Identity;
@@ -51,7 +52,21 @@ namespace HiveServer.Controllers
         /// <returns></returns>
         public async Task<dynamic> Post([FromBody] Staff newStaff)
         {
+
             var UserId = long.Parse(User.Identity.GetUserId());
+
+            HttpResponseMessage responce = Utils.CheckModel(newStaff, Request);
+            if (!responce.IsSuccessStatusCode)
+                return responce;
+
+            var contacts = await db.Contacts.FirstOrDefaultAsync(b => (b.Person1Id == UserId && b.Person2Id == newStaff.personID)
+                || ( b.Person1Id == newStaff.personID && b.Person2Id == UserId ));
+
+            if(contacts == null)
+            { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
+
+            if(contacts.State != ContactDb.StateFriend)
+            { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
             var bindingsList = await db.Bindings.Where(b => b.FarmID == newStaff.atFarmID).Include(b => b.Farm).ToArrayAsync();   
 
@@ -89,6 +104,10 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Put([FromUri] long id, [FromBody] Staff changedStaff)
         {
             var UserId = long.Parse(User.Identity.GetUserId());
+
+            HttpResponseMessage responce = Utils.CheckModel(changedStaff, Request);
+            if (!responce.IsSuccessStatusCode)
+                return responce;
 
             var bindingsList = await db.Bindings.Where(b => b.FarmID == changedStaff.atFarmID).Include(b => b.Farm).ToArrayAsync();
             var selectedBond = bindingsList?.FirstOrDefault(b => b.Id == id);

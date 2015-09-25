@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-
-
+using System.ComponentModel.DataAnnotations;
 
 namespace HiveServer.DTO
 {
-    public class Farm: Base.Entity
+    public class Farm: Base.Entity ,  IValidatableObject
     {
         public string name { get; set; }
 
@@ -15,6 +14,21 @@ namespace HiveServer.DTO
 
         public string role { get; set; }
 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                yield return new ValidationResult("Provide name for the farm please");
+            }
+            if (string.IsNullOrEmpty(farmDescription))
+            {
+                farmDescription = string.Empty;
+            }
+            if (Version == null || Version.Count() < 5)
+            {
+                yield return new ValidationResult("Version information is missing or too short");
+            }
+        }
 
         public static explicit operator Farm(Models.FarmData.BondDb v)
         {
