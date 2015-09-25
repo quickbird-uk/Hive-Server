@@ -20,6 +20,7 @@ namespace HiveServer.Models
         public DbSet<FarmDb> Farms { get; set; }
         public DbSet<FieldDb> Fields { get; set; }
 
+        public DbSet<JobDb> Jobs { get; set; }
 
         public ApplicationDbContext() : base("DefaultConnection")
         {   Configuration.LazyLoadingEnabled = true;    }
@@ -62,6 +63,14 @@ namespace HiveServer.Models
 
             modelBuilder.Entity<FieldDb>().ToTable("Fields");
 
+            //configure jobs
+            modelBuilder.Entity<JobDb>().ToTable("Jobs");
+            modelBuilder.Entity<JobDb>().HasRequired(j => j.assignedBy).WithMany(p => p.JobsGiven).WillCascadeOnDelete(false);
+            modelBuilder.Entity<JobDb>().HasRequired(j => j.assignedTo).WithMany(p => p.JobsRecieved).WillCascadeOnDelete(false);
+            modelBuilder.Entity<JobDb>().HasRequired(j => j.onField).WithMany(f => f.Jobs).WillCascadeOnDelete(false);
+            modelBuilder.Entity<JobDb>().Property(j => j.name).IsRequired();
+            modelBuilder.Entity<JobDb>().Property(j => j.state).IsRequired(); ;
+            modelBuilder.Entity<JobDb>().Property(j => j.type).IsRequired();
 
         }
 

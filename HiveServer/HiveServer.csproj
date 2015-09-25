@@ -176,6 +176,8 @@
   <ItemGroup>
     <Compile Include="Base\LoginUtils.cs" />
     <Compile Include="Base\Utils.cs" />
+    <Compile Include="Controllers\JobsController.cs" />
+    <Compile Include="Controllers\FieldsController.cs" />
     <Compile Include="Controllers\StaffController.cs" />
     <Compile Include="Controllers\FarmsController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
@@ -183,6 +185,10 @@
     <Compile Include="Migrations\201509231642124_Initial.cs" />
     <Compile Include="Migrations\201509231642124_Initial.Designer.cs">
       <DependentUpon>201509231642124_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509252027578_Fixed Jobs.cs" />
+    <Compile Include="Migrations\201509252027578_Fixed Jobs.Designer.cs">
+      <DependentUpon>201509252027578_Fixed Jobs.cs</DependentUpon>
     </Compile>
     <Compile Include="SMSService.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -327,6 +333,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201509231642124_Initial.resx">
       <DependentUpon>201509231642124_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509252027578_Fixed Jobs.resx">
+      <DependentUpon>201509252027578_Fixed Jobs.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

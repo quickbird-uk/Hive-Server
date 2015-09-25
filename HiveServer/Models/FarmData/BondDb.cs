@@ -43,6 +43,7 @@ namespace HiveServer.Models.FarmData
         public const string RoleAgronomist = "Agro";
         public const string RoleCrew = "Crew";
         public const string RoleAny = "Any";
+        public const string RoleNone = "NA";
 
     }
 

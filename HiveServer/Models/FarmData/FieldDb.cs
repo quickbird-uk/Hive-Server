@@ -18,6 +18,14 @@ namespace HiveServer.Models.FarmData
         public virtual FarmDb OnFarm { get; set;}
 
         public long OnFarmId { get; set; }
+
+        public virtual List<JobDb> Jobs { get; set; }
+
+        public FieldDb()
+        {
+            Jobs = new List<JobDb>();
+        }
+
     }
 
   

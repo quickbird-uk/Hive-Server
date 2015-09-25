@@ -1,6 +1,7 @@
 ﻿using HiveServer.Base;
 using HiveServer.DTO;
 using HiveServer.Models;
+using HiveServer.Models.FarmData;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,9 @@ namespace HiveServer.Controllers
     [RoutePrefix("Farms")]
     public class FarmsController : ApiController
     {
+
+
+
         private ApplicationDbContext db = new ApplicationDbContext();
 
         /// <summary> Returns a list of fgarms, the the role this user has on those farms </summary>
@@ -25,9 +29,9 @@ namespace HiveServer.Controllers
         [ResponseType(typeof(List<DTO.Farm>))]
         public async Task<dynamic> Get()
         {
-            var UserId = long.Parse(User.Identity.GetUserId());
+            var userId = long.Parse(User.Identity.GetUserId());
             
-            List<Models.FarmData.BondDb> relevantFarms = await db.Bindings.Where(f => f.PersonID == UserId).ToListAsync();
+            List<BondDb> relevantFarms = await QueryAllRelevantBonds(userId, db).ToListAsync();
             List<Farm> farmsDTO = new List<Farm>();
 
             foreach (var farm in relevantFarms)
@@ -43,7 +47,7 @@ namespace HiveServer.Controllers
         /// <summary>
         /// Creates a new farm. The ID you assign to hte farm will be ignored. ONly name and description is respected 
         /// </summary>
-        /// <param name="contactID">returns 200 if successfull, or ErrorResponce</param>
+        /// <param name="newFarm">returns 200 if successfull, or ErrorResponce</param>
         public async Task<dynamic> Post([FromBody] Farm newFarm)
         {
             HttpResponseMessage responce = Utils.CheckModel(newFarm, Request);
@@ -76,7 +80,7 @@ namespace HiveServer.Controllers
         /// You can alter the farm's name and description, if you are the owner.  You can also Undelete a farm, by setting Deleted to false
         /// </summary>
         /// <param name="id">Id of the farm</param>
-        /// <param name="contactWeb"> The farm object</param>
+        /// <param name="newFarm"> The farm object</param>
         /// <returns></returns>
         public async Task<dynamic> Put([FromUri] long id, [FromBody] Farm newFarm)
         {
@@ -86,9 +90,9 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var farmBinding = await db.Bindings.Where(b => b.PersonID == UserId && b.FarmID == id ).Include( f => f.Farm).FirstOrDefaultAsync(); 
+            var farmBinding = await GetThisBondAndFarm(UserId, id, db);
 
-            if(farmBinding == null)
+            if (farmBinding == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
             if (farmBinding.Role != Models.FarmData.BondDb.RoleOwner)
@@ -117,7 +121,7 @@ namespace HiveServer.Controllers
         {
             var UserId = long.Parse(User.Identity.GetUserId());
 
-            var farmBinding = await db.Bindings.Where(b => b.PersonID == UserId && b.FarmID == id).Include(f => f.Farm).FirstOrDefaultAsync();
+            var farmBinding = await GetThisBondAndFarm(UserId, id, db);
 
             if (farmBinding == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
@@ -130,5 +134,59 @@ namespace HiveServer.Controllers
             return Ok();
         }
 
-    }
+        internal static string FindAndGetRole(FarmDb farm, long userId)
+        {
+            var bindings = farm.Bonds;
+            string access = BondDb.RoleNone;
+
+            foreach (var bond in bindings)
+            {
+                if (bond.PersonID == userId)
+                {
+                    access = bond.Role;
+                }
+            }
+
+            return access;
+        }
+
+        internal static async Task<BondDb> GetThisBondAndFarmAndBonds(long userId, long farmId, ApplicationDbContext db)
+        {
+            var farmBinding = await db.Bindings.Where(b => b.PersonID == userId && b.FarmID == farmId).Include(f => f.Farm).Include(f => f.Farm.Bonds).FirstOrDefaultAsync();
+            return farmBinding; 
+        }
+
+        internal static async Task<BondDb> GetThisBondAndFarm(long userId, long farmId, ApplicationDbContext db)
+        {
+            var farmBinding = await db.Bindings.Where(b => b.PersonID == userId && b.FarmID == farmId).Include(f => f.Farm).FirstOrDefaultAsync();
+            return farmBinding;
+        }
+
+        internal static IQueryable<FarmDb> QueryAllRelevantFarms(long userId, ApplicationDbContext db)
+        {
+            var farmBinding =  db.Bindings.Where(b => b.PersonID == userId).Select(f => f.Farm);
+            return farmBinding;
+        }
+
+        internal static IQueryable<BondDb> QueryAllRelevantBonds(long userId, ApplicationDbContext db)
+        {
+            var Bonds = db.Bindings.Where(b => b.PersonID == userId);
+            return Bonds;
+        }
+
+        //internal static Func<ApplicationDbContext, IQueryable<BondDb>> QueryBonds()
+        //{
+        //    int userId = 5; 
+
+        //    Func<ApplicationDbContext, IQueryable<BondDb>> QueryRelevantBonds = d =>
+        //    {
+        //        var Bonds = d.Bindings.Where(b => b.PersonID == userId);
+        //        return Bonds;
+        //    };
+        //}
+
+        
+
+
+}
 }
