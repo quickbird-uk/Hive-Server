@@ -29,6 +29,10 @@ namespace HiveServer.Models
         {
             base.OnModelCreating(modelBuilder);
 
+            //Enable logging
+            Database.Log = Console.Write;
+
+
             modelBuilder.Entity<ApplicationUser>().Property(i => i.LastName).IsRequired().HasMaxLength(100);
             modelBuilder.Entity<ApplicationUser>().Property(i => i.FirstName).IsRequired().HasMaxLength(100);            
             modelBuilder.Entity<ApplicationUser>().Property(i => i.OTPSecret).IsRequired().HasMaxLength(256);
@@ -53,7 +57,7 @@ namespace HiveServer.Models
             //modelBuilder.Entity<ContacDb>().HasKey(p => new { p.Person1Id, p.Friend2Id});
             modelBuilder.Entity<ContactDb>().HasRequired(p => p.Person2).WithMany().WillCascadeOnDelete(false);
             modelBuilder.Entity<ContactDb>().HasRequired(p => p.Person1).WithMany().WillCascadeOnDelete(false);
-            modelBuilder.Entity<ContactDb>().Property(p => p.State).HasMaxLength(2);
+            modelBuilder.Entity<ContactDb>().Property(p => p.State).HasMaxLength(2).IsFixedLength();
             modelBuilder.Entity<ContactDb>().ToTable("Contacts");
 
 
@@ -69,7 +73,7 @@ namespace HiveServer.Models
             modelBuilder.Entity<JobDb>().HasRequired(j => j.assignedTo).WithMany(p => p.JobsRecieved).WillCascadeOnDelete(false);
             modelBuilder.Entity<JobDb>().HasRequired(j => j.onField).WithMany(f => f.Jobs).WillCascadeOnDelete(false);
             modelBuilder.Entity<JobDb>().Property(j => j.name).IsRequired();
-            modelBuilder.Entity<JobDb>().Property(j => j.state).IsRequired(); ;
+            modelBuilder.Entity<JobDb>().Property(j => j.state).IsRequired().IsFixedLength().HasMaxLength(3); 
             modelBuilder.Entity<JobDb>().Property(j => j.type).IsRequired();
 
         }

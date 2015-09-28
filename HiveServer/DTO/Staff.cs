@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HiveServer.Models.FarmData;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -39,6 +40,11 @@ namespace HiveServer.DTO
             if (Version == null || Version.Count() < 5)
             {
                 yield return new ValidationResult("Version information is missing or too short");
+            }
+
+            if(! BondDb.ValidStates.Contains(role))
+            {
+                yield return new ValidationResult("You did not spesify a role, or it's invalid");
             }
         }
 

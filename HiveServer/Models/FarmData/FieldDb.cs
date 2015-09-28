@@ -11,6 +11,8 @@ namespace HiveServer.Models.FarmData
     {
         public string Name { get; set; }
 
+        public double size { get; set; }
+
         public string FieldDescription { get; set; }
 
         public string ParcelNumber { get; set; }

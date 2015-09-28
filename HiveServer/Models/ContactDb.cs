@@ -42,7 +42,7 @@ namespace HiveServer.Models
         public const string StatePendingP2 = "P2";
         public const string StateBlockedP1 = "B1";
         public const string StateBlockedP2 = "B2";
-
+        public static readonly string[] ValidStates = { StateFriend, StatePendingP1, StatePendingP2, StateBlockedP1, StateBlockedP2 };
 
 
 

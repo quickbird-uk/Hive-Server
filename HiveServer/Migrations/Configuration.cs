@@ -31,9 +31,9 @@ namespace HiveServer.Migrations
             List<ApplicationUser> users = new List<ApplicationUser>();
             users.Add(new ApplicationUser
             {
-                FirstName = "Bob",
-                LastName = "Stone",
-                PhoneNumber = 777777777,
+                FirstName = "Nobody",
+                LastName = "Nobody",
+                PhoneNumber = 0000000000,
    
             });
 
@@ -154,7 +154,11 @@ namespace HiveServer.Migrations
                     for (int i = 0; i < nOfFields; i++)
                     {
 
-                       // farm.Fields.Add(new FieldDb(crops[RNG.Next(11)] + " " + (RNG.Next(2, 6) * fieldSize).ToString("0.#") + " ha"));
+                        farm.Fields.Add(new FieldDb {
+                            Name = crops[RNG.Next(11)],
+                            size = Math.Round(RNG.Next(2, 6) * fieldSize, 1)
+                       }
+                       );
                     }
 
                 }
@@ -188,17 +192,17 @@ namespace HiveServer.Migrations
 
                     }
                     //Push the records and contacts in
-                    //foreach (var contactId in contacts)
-                    //{
-                    //    context.ContactBook.Add(new ContacDb
-                    //    {
-                    //        Person1Id = user.Id,
-                    //        Person1 = user,
-                    //        Friend2 = users[contactId],
-                    //        Friend2Id = users[contactId].Id,
-                    //        State = DBRelationshipState.Friends
-                    //    });
-                    //}
+                    foreach (var contactId in contacts)
+                    {
+                        context.Contacts.Add(new ContactDb
+                        {
+                            Person1Id = user.Id,
+                            Person1 = user,
+                            Person2 = users[contactId],
+                            Person2Id = users[contactId].Id,
+                            State = ContactDb.StateFriend
+                        });
+                    }
 
                 }
 

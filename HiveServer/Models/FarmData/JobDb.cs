@@ -13,7 +13,7 @@ namespace HiveServer.Models
 
         public JobDb()
         {
-
+            long me = DateTime.UtcNow.ToBinary(); 
 
 
         }
@@ -32,14 +32,22 @@ namespace HiveServer.Models
         public virtual ApplicationUser assignedTo { get; set; }
         public virtual long assignedToId { get; set; }
 
-        public String state { get; set; }
+        public DateTime CompleteOn { get; set; }
 
-        public String lastAction { get; set; }
+        public string state { get; set; }
+
+        public string EventLog { get; set; }
 
         public double rate { get; set; }
 
+        public static string StateVanilla = "Van";
+        public static string StateOrphan = "Orf";
+        public static string StateAssigned = "Ass";
+        public static string StateInProgress = "InP";
+        public static string StatePaused = "Pau";
+        public static string StateFinished= "Fin";
 
-
+        public static readonly string[] ValidStates = { StateVanilla, StateOrphan, StateAssigned, StateInProgress, StatePaused, StateFinished };
     }
 
   

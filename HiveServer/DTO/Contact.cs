@@ -1,4 +1,5 @@
 ﻿using HiveServer.DTO;
+using HiveServer.Models.FarmData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -33,6 +34,11 @@ namespace HiveServer.DTO
             if (Version == null || Version.Count() < 5)
             {
                 yield return new ValidationResult("Version information is missing or too short");
+            }
+
+            if(! BondDb.ValidStates.Contains(state))
+            {
+                yield return new ValidationResult("You have not supplied a valid state");
             }
         }
     }

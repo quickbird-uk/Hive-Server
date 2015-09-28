@@ -11,6 +11,8 @@ namespace HiveServer.DTO
     {
         public string name { get; set; }
 
+        public double size { get; set; }
+
         public string fieldDescription { get; set; }
 
         public long atFarm { get; set; }
@@ -49,6 +51,7 @@ namespace HiveServer.DTO
                 Id = v.Id,
                 atFarm = v.OnFarmId,
                 name = v.Name,
+                size = v.size,
                 fieldDescription = v.FieldDescription,
                 CreatedAt = v.CreatedAt,
                 UpdatedAt = v.UpdatedAt,

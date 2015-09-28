@@ -182,6 +182,7 @@
     <Compile Include="Controllers\FarmsController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="DTO\Account\SMSRequest.cs" />
+    <Compile Include="DTO\Action.cs" />
     <Compile Include="Migrations\201509231642124_Initial.cs" />
     <Compile Include="Migrations\201509231642124_Initial.Designer.cs">
       <DependentUpon>201509231642124_Initial.cs</DependentUpon>
@@ -189,6 +190,14 @@
     <Compile Include="Migrations\201509252027578_Fixed Jobs.cs" />
     <Compile Include="Migrations\201509252027578_Fixed Jobs.Designer.cs">
       <DependentUpon>201509252027578_Fixed Jobs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509281306553_AddedEventsToJobs.cs" />
+    <Compile Include="Migrations\201509281306553_AddedEventsToJobs.Designer.cs">
+      <DependentUpon>201509281306553_AddedEventsToJobs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509281404492_AddedEventsToJobs1.cs" />
+    <Compile Include="Migrations\201509281404492_AddedEventsToJobs1.Designer.cs">
+      <DependentUpon>201509281404492_AddedEventsToJobs1.cs</DependentUpon>
     </Compile>
     <Compile Include="SMSService.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -336,6 +345,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509252027578_Fixed Jobs.resx">
       <DependentUpon>201509252027578_Fixed Jobs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509281306553_AddedEventsToJobs.resx">
+      <DependentUpon>201509281306553_AddedEventsToJobs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509281404492_AddedEventsToJobs1.resx">
+      <DependentUpon>201509281404492_AddedEventsToJobs1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

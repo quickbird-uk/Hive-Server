@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HiveServer.Models;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,11 +21,49 @@ namespace HiveServer.DTO
 
         public virtual long assignedToId { get; set; }
 
+
+        public DateTime CompleteOn { get; set; }
+
+        public virtual List<Action> Events { get; set; }
+
         public string state { get; set; }
 
-        public string lastAction { get; set; }
-
         public double rate { get; set; }
+
+
+        public Job ()
+        {
+            Events = new List<Action>();
+            
+        }
+
+        public static explicit operator Job(Models.JobDb v)
+        {
+            Job dto =  new Job
+            {
+                Id = v.Id,
+                name = v.name,
+                jobDescription = v.jobDescription,
+
+                state = v.state,
+                rate = v.rate,
+                type = v.type,
+                CompleteOn = v.CompleteOn, 
+                assignedById = v.assignedById,
+                assignedToId = v.assignedToId,
+
+                onFieldId = v.onFieldId,
+                CreatedAt = v.CreatedAt,
+                UpdatedAt = v.UpdatedAt,
+                Version = v.Version,
+                Deleted = v.Deleted
+            };
+
+            dto.Events = JsonConvert.DeserializeObject<List<Action>>(v.EventLog);
+
+            return dto; 
+        }
+
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -63,7 +103,10 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("You must provide ID of the assignee");
             }
-
+            if(JobDb.ValidStates.Contains(state))
+            {
+                yield return new ValidationResult("You did not provide a valid state");
+            }
         }
 
     }

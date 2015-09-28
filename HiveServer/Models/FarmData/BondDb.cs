@@ -44,7 +44,7 @@ namespace HiveServer.Models.FarmData
         public const string RoleCrew = "Crew";
         public const string RoleAny = "Any";
         public const string RoleNone = "NA";
-
+        public static readonly string[] ValidStates = { RoleOwner, RoleManager, RoleAgronomist, RoleCrew }; 
     }
 
 }
