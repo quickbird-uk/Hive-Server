@@ -148,13 +148,13 @@ namespace HiveServer.Controllers
 
             var bondsList =  await db.Farms.Where(f => f.Bonds.Any(b=> b.Id == id)).Select(f => f.Bonds).FirstOrDefaultAsync();
 
-            if(bondsList.Count == 0)
+            if(bondsList == null || bondsList?.Count == 0)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            var usersRole = bondsList.FirstOrDefault(b => b.PersonID == UserId)?.Role;
-            var selectedBond = bondsList.FirstOrDefault(b => b.Id == id);
+            var usersRole = bondsList.FirstOrDefault(b => b.PersonID == UserId)?.Role; //ROle of this user on the farm
+            var selectedBond = bondsList.FirstOrDefault(b => b.Id == id); //The bond this user is trying to delete
 
-            if (usersRole != BondDb.RoleManager && usersRole != BondDb.RoleOwner)
+            if (usersRole != BondDb.RoleManager && usersRole != BondDb.RoleOwner && selectedBond.PersonID == UserId) //THe person has no permissions unless he is trying to delete himself 
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
 
             //can't delete yourself if you are the last Owner

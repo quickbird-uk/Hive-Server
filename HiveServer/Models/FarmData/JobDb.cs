@@ -32,7 +32,9 @@ namespace HiveServer.Models
         public virtual ApplicationUser assignedTo { get; set; }
         public virtual long assignedToId { get; set; }
 
-        public DateTime CompleteOn { get; set; }
+        public DateTime DueDate { get; set; }
+
+        public DateTime DateFinished { get; set; }
 
         public string state { get; set; }
 
@@ -40,14 +42,15 @@ namespace HiveServer.Models
 
         public double rate { get; set; }
 
-        public static string StateVanilla = "Van";
-        public static string StateOrphan = "Orf";
+        public TimeSpan timeSpent { get; set; }
+
+        public static string StatePending = "Pen";
         public static string StateAssigned = "Ass";
         public static string StateInProgress = "InP";
         public static string StatePaused = "Pau";
         public static string StateFinished= "Fin";
 
-        public static readonly string[] ValidStates = { StateVanilla, StateOrphan, StateAssigned, StateInProgress, StatePaused, StateFinished };
+        public static readonly string[] ValidStates = { StatePending, StateAssigned, StateInProgress, StatePaused, StateFinished };
     }
 
   

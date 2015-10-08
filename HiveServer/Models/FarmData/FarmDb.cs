@@ -60,7 +60,7 @@ namespace HiveServer.Models
 
         public List<ApplicationUser> Agronomists()
         {
-            return SelectBonds(BondDb.RoleAgronomist);
+            return SelectBonds(BondDb.RoleSpecialist);
         }
 
 

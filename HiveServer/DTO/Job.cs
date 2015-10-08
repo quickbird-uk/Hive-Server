@@ -21,19 +21,22 @@ namespace HiveServer.DTO
 
         public virtual long assignedToId { get; set; }
 
+        public DateTime DateFinished { get; set; }
 
-        public DateTime CompleteOn { get; set; }
+        public DateTime DueDate { get; set; }
 
-        public virtual List<Action> Events { get; set; }
+        public virtual List<JobEvent> Events { get; set; }
 
         public string state { get; set; }
 
         public double rate { get; set; }
 
+        public TimeSpan timeSpent { get; set; }
+
 
         public Job ()
         {
-            Events = new List<Action>();
+            Events = new List<JobEvent>();
             
         }
 
@@ -48,9 +51,11 @@ namespace HiveServer.DTO
                 state = v.state,
                 rate = v.rate,
                 type = v.type,
-                CompleteOn = v.CompleteOn, 
+                DueDate = v.DueDate, 
                 assignedById = v.assignedById,
                 assignedToId = v.assignedToId,
+                timeSpent = v.timeSpent,
+                DateFinished = v.DateFinished,
 
                 onFieldId = v.onFieldId,
                 CreatedAt = v.CreatedAt,
@@ -59,7 +64,7 @@ namespace HiveServer.DTO
                 Deleted = v.Deleted
             };
 
-            dto.Events = JsonConvert.DeserializeObject<List<Action>>(v.EventLog);
+            dto.Events = JsonConvert.DeserializeObject<List<JobEvent>>(v.EventLog);
 
             return dto; 
         }
@@ -106,6 +111,10 @@ namespace HiveServer.DTO
             if(JobDb.ValidStates.Contains(state))
             {
                 yield return new ValidationResult("You did not provide a valid state");
+            }
+            if (timeSpent == null || timeSpent > new TimeSpan(2,0,0,0,0))
+            {
+                yield return new ValidationResult("You must spesify time spent and it must be sane");
             }
         }
 

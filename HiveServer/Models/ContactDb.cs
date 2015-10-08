@@ -75,7 +75,7 @@ namespace HiveServer.Models
             else if (Person2Id == userId)
             {
                 friendDto.firstName = Person1.FirstName;
-                friendDto.lastName = Person2.LastName;
+                friendDto.lastName = Person1.LastName;
                 friendDto.phone = Person1.PhoneNumber;
                 friendDto.personID = Person1Id;
 

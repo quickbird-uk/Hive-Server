@@ -39,7 +39,7 @@ namespace HiveServer.Controllers
                 farmsDTO.Add((Farm)farm); 
             }
 
-            return Request.CreateResponse(HttpStatusCode.BadRequest, farmsDTO);
+            return Request.CreateResponse(HttpStatusCode.OK, farmsDTO);
         }
 
 

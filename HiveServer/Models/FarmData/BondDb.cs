@@ -40,11 +40,16 @@ namespace HiveServer.Models.FarmData
 
         public const string RoleOwner = "Own";
         public const string RoleManager = "Man";
-        public const string RoleAgronomist = "Agro";
+        public const string RoleSpecialist = "Spec";
         public const string RoleCrew = "Crew";
         public const string RoleAny = "Any";
         public const string RoleNone = "NA";
-        public static readonly string[] ValidStates = { RoleOwner, RoleManager, RoleAgronomist, RoleCrew }; 
+        public static readonly string[] ValidStates = { RoleOwner, RoleManager, RoleSpecialist, RoleCrew };
+
+        public static readonly string[] CanAssignJobsToOthers = { RoleOwner, RoleManager, RoleSpecialist };
+        public static readonly string[] CanManageStaff = { RoleOwner, RoleManager};
+        public static readonly string[] CanEditFarm = { RoleOwner};
+
     }
 
 }

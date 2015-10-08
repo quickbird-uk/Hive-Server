@@ -75,7 +75,7 @@ namespace HiveServer.Migrations
             {
                 FirstName = "Manuel",
                 LastName = "Sanabria",
-                PhoneNumber = +44745272505,
+                PhoneNumber = 745272505,
                 Email = "manuel@quickbird.uk",
 
             });
@@ -109,7 +109,7 @@ namespace HiveServer.Migrations
                         users[2].Bound.Add(new BondDb
                         {
                             Farm = user.Bound[0].Farm,
-                            Role = BondDb.RoleAgronomist
+                            Role = BondDb.RoleSpecialist
                         });
                     }
                 }

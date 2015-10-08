@@ -451,7 +451,7 @@ namespace HiveServer.Controllers
                     var sqlException = (System.Data.SqlClient.SqlException)innermost;
 
                     if (sqlException.Number == 2601)
-                        return ErrorResponse.PhoneTaken;
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PhoneTaken); 
 
                 }
                 return innermost; 
@@ -465,7 +465,7 @@ namespace HiveServer.Controllers
             }
             else
             {
-                return ErrorResponse.SomethingHappened; 
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.SomethingHappened); 
             }
                         
         }
@@ -487,7 +487,7 @@ namespace HiveServer.Controllers
 
             if(user == null || ! String.Equals(user.LastName, model.lastName, StringComparison.OrdinalIgnoreCase)) //if the user does not exist, or if their last name does not match phone number
             {
-                return Request.CreateResponse(HttpStatusCode.OK, ErrorResponse.CantLogin);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantLogin);
             }
             else 
             {

@@ -182,7 +182,7 @@
     <Compile Include="Controllers\FarmsController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="DTO\Account\SMSRequest.cs" />
-    <Compile Include="DTO\Action.cs" />
+    <Compile Include="DTO\JobEvent.cs" />
     <Compile Include="Migrations\201509231642124_Initial.cs" />
     <Compile Include="Migrations\201509231642124_Initial.Designer.cs">
       <DependentUpon>201509231642124_Initial.cs</DependentUpon>
