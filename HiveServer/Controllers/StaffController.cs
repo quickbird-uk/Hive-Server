@@ -22,7 +22,7 @@ namespace HiveServer.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         /// <summary>
-        /// Gets all the staff assigned to all farms that the person works on
+        /// Gets all the staff assigned to all organisations that the person works for
         /// </summary>
         /// <returns></returns>
         [ResponseType(typeof(List<DTO.Staff>))]
@@ -30,9 +30,9 @@ namespace HiveServer.Controllers
         {
             var UserId = long.Parse(User.Identity.GetUserId());
 
-            var relevantFarms = db.Bindings.Where(b => b.PersonID == UserId).Select(f => f.FarmID);
+            var relevantOrgs = db.Bindings.Where(b => b.PersonID == UserId).Select(f => f.OrganisationID);
 
-            var staffBonds = await db.Bindings.Where(b => relevantFarms.Any(f => b.FarmID == f)).Include(p => p.Person).ToListAsync();
+            var staffBonds = await db.Bindings.Where(b => relevantOrgs.Any(f => b.OrganisationID == f)).Include(p => p.Person).ToListAsync();
 
             List<Staff> staffList = new List<Staff>();
             foreach(var staffBond in staffBonds)
@@ -46,9 +46,9 @@ namespace HiveServer.Controllers
 
 
         /// <summary>
-        /// Adds staff to the farm
+        /// Adds staff to the ORganisation
         /// </summary>
-        /// <param name="newStaff">Staff to be added. Essentially you choose the farmID of the farm to add staff to, the ID of the person to add, and his role</param>
+        /// <param name="newStaff">Staff to be added. Essentially you choose the OrgID of the Organisation to add staff to, the ID of the person to add, and his role</param>
         /// <returns></returns>
         public async Task<dynamic> Post([FromBody] Staff newStaff)
         {
@@ -68,9 +68,9 @@ namespace HiveServer.Controllers
             if(contacts.State != ContactDb.StateFriend)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
-            var bindingsList = await db.Bindings.Where(b => b.FarmID == newStaff.atFarmID).Include(b => b.Farm).ToArrayAsync();   
+            var bindingsList = await db.Bindings.Where(b => b.OrganisationID == newStaff.atOrgID).Include(b => b.Organisation).ToArrayAsync();   
 
-            if (bindingsList.Count() == 0) //does the spesified farm exist
+            if (bindingsList.Count() == 0) //does the spesified organisation exist
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
             var usersRole = bindingsList.FirstOrDefault(b => b.PersonID == UserId)?.Role; 
@@ -78,7 +78,7 @@ namespace HiveServer.Controllers
             if (usersRole != BondDb.RoleManager && usersRole != BondDb.RoleOwner)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
 
-            //is the person already assigned as staff for this farm? 
+            //is the person already assigned as staff for this Orgonisation? 
             if (bindingsList.Any(b => b.PersonID == newStaff.personID))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantOverrite); }
 
@@ -87,17 +87,29 @@ namespace HiveServer.Controllers
 
             BondDb staffDB = new BondDb
             {
-                FarmID = newStaff.atFarmID,
+                OrganisationID = newStaff.atOrgID,
                 PersonID = newStaff.personID,
                 Role = newStaff.role
             };
 
             db.Bindings.Add(staffDB);
             await db.SaveChangesAsync();
+
+            //Create an SMS notification
+            var inviter = await db.Users.FirstOrDefaultAsync(i => i.Id == UserId);
+            string inviterName = inviter.FirstName + " " + inviter.LastName;
+            var invitee = await db.Users.FirstOrDefaultAsync(i => i.Id == staffDB.PersonID);
+
+            var organisation = await db.Organisations.FirstOrDefaultAsync(f => f.Id == newStaff.atOrgID);
+            string organisationName = organisation.Name;
+            string message = String.Format("You have been assigned as {0} on {1} by {2}. Congratulations! If {2} gives you unwanted assignment, you may remove {2} from your contacts ", staffDB.Role, organisationName, inviterName);
+
+            await SMSService.SendMessage(invitee.PhoneNumber.ToString(), message);
+
             return Ok();
         }
 
-        /// <summary> Allows the person to alter Role of staff already assigned to the farm, manager cannot alter the Role of the farm owner, only managers and owners can do this</summary>
+        /// <summary> Allows the person to alter Role of staff already assigned to the organisation, manager cannot alter the Role of the organisation owner, only managers and owners can do this</summary>
         /// <param name="StaffId">id of the staff that should be alteres</param>
         /// <param name="changedStaff">the class containing changes to be made. Essentially you can only change the role</param>
         /// <returns></returns>
@@ -109,10 +121,10 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var bindingsList = await db.Bindings.Where(b => b.FarmID == changedStaff.atFarmID).Include(b => b.Farm).ToArrayAsync();
+            var bindingsList = await db.Bindings.Where(b => b.OrganisationID == changedStaff.atOrgID).Include(b => b.Organisation).ToArrayAsync();
             var selectedBond = bindingsList?.FirstOrDefault(b => b.Id == id);
 
-            if (selectedBond == null) //does the spesified farm exist
+            if (selectedBond == null) //does the spesified organisation exist
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
             var usersRole = bindingsList.FirstOrDefault(b => b.PersonID == UserId)?.Role;
@@ -139,26 +151,27 @@ namespace HiveServer.Controllers
 
 
 
-        /// <summary> Will delete staff from the farm, but you cannot delete yourself if you are the last owner </summary>
+        /// <summary> Will delete staff from the organisation, but you cannot delete yourself if you are the last owner </summary>
         /// <param name="id"> Id of the staff </param>
         /// <returns>Returns OK if done, and ErrorResponce if there is an error</returns>
         public async Task<dynamic> Delete([FromUri] long id)
         {
             var UserId = long.Parse(User.Identity.GetUserId());
 
-            var bondsList =  await db.Farms.Where(f => f.Bonds.Any(b=> b.Id == id)).Select(f => f.Bonds).FirstOrDefaultAsync();
+            var bondsList =  await db.Organisations.Where(f => f.Bonds.Any(b=> b.Id == id)).Select(f => f.Bonds).FirstOrDefaultAsync();
 
             if(bondsList == null || bondsList?.Count == 0)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            var usersRole = bondsList.FirstOrDefault(b => b.PersonID == UserId)?.Role; //ROle of this user on the farm
+            var usersBond = bondsList.FirstOrDefault(b => b.PersonID == UserId); 
+            var usersRole = usersBond?.Role; 
             var selectedBond = bondsList.FirstOrDefault(b => b.Id == id); //The bond this user is trying to delete
 
-            if (usersRole != BondDb.RoleManager && usersRole != BondDb.RoleOwner && selectedBond.PersonID == UserId) //THe person has no permissions unless he is trying to delete himself 
+            if (usersRole != BondDb.RoleManager && usersRole != BondDb.RoleOwner && selectedBond != usersBond) //THe person has no permissions unless he is trying to delete himself 
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
 
             //can't delete yourself if you are the last Owner
-            if (selectedBond.PersonID == UserId && bondsList.Where(b => b.Role == BondDb.RoleOwner).Count() == 1)
+            if (selectedBond.Role == BondDb.RoleOwner && bondsList.Where(b => b.Role == BondDb.RoleOwner).Count() == 1)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             if (usersRole == BondDb.RoleManager && selectedBond.Role == BondDb.RoleOwner)

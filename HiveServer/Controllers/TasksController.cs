@@ -17,61 +17,85 @@ using System.Web.Http.Description;
 namespace HiveServer.Controllers
 {
     [Authorize]
-    [RoutePrefix("Jobs")]
-    public class JobsController : ApiController
+    [RoutePrefix("Tasks")]
+    public class TasksController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private long UserId;
-        private List<JobEvent> eventLog = new List<JobEvent>();
+        private List<TaskEvent> eventLog = new List<TaskEvent>();
+        private readonly bool[][] Permissions = new bool[8][]; 
+ 
 
-        public JobsController()
+        public TasksController()
         {
             UserId = long.Parse(User.Identity.GetUserId());
+            int i = 0;
+            /// Right Columns indicate whether basic edits are allowed, and whether advanced edits are allowed. 
+
+            ///      Edit Right || To self	|| By self || Basic ||	Advanced
+            ///          Y	         Y	         Y	         Y	     Y
+            ///          Y	         Y	         N	         Y       Y
+            ///          Y           N	         N	         Y	     Y
+            ///          Y	         N	         Y	         Y	     Y
+            ///          N	         N	         Y	         N	     N
+            ///          N	         N	         N	         N	     N
+            ///          N	         Y	         N	         Y	     N
+            ///          N	         Y	         Y	         Y	     Y
+                                       //Edit Right || To self|| By self || Basic || Advanced
+            Permissions[i++] = new bool[5]{ true,        true,     true,     true,     true };
+            Permissions[i++] = new bool[5]{ true,        true,     false,    true,     true };
+            Permissions[i++] = new bool[5]{ true,        false,    false,    true,     true };
+            Permissions[i++] = new bool[5]{ true,        false,    true,     true,     true };
+            Permissions[i++] = new bool[5]{ false,       false,    true,     false,    false};
+            Permissions[i++] = new bool[5]{ false,       false,    false,    false,    false};
+            Permissions[i++] = new bool[5]{ false,       true,     false,    true,     false};
+            Permissions[i++] = new bool[5]{ false,       true,     true,     true,     true };            
         }
 
         /// <summary> gets a list of Jobs. Some are assigned to this person, some are assigned by this person. 
-        /// Others are just jobs happening on the farm where this person is working</summary>
+        /// Others are just jobs happening on the organisation where this person is working</summary>
         /// <returns></returns>
-        [ResponseType(typeof(List<Job>))]
+        [ResponseType(typeof(List<DTO.TaskDTO>))]
         public async Task<dynamic> Get()
         {
-            var relevantJobs =  await db.Farms.Where(f => f.Bonds.Any(b => b.PersonID == UserId) && f.Deleted == false)
+            var relevantJobs =  await db.Organisations.Where(f => f.Bonds.Any(b => b.PersonID == UserId) && f.Deleted == false)
                 .Select(b => b.Fields.Where(f => f.Deleted == false).Select(d => d.Jobs)).ToListAsync();
 
-            var personalJobs = await db.Jobs.Where(j => j.assignedById == UserId || j.assignedToId == UserId).ToArrayAsync(); 
+            var personalJobs = await db.Tasks.Where(j => j.assignedById == UserId || j.assignedToId == UserId).ToArrayAsync();
 
-            List <Job> jobsDTO = new List<Job>(); 
+            List<DTO.TaskDTO> jobsDTO = new List<DTO.TaskDTO>(); 
             
             foreach(JobDb job in relevantJobs)
             {
-                jobsDTO.Add((Job)job); 
+                jobsDTO.Add((DTO.TaskDTO)job); 
             }
             foreach(JobDb job in personalJobs)
             {
-                jobsDTO.Add((Job)job);
+                jobsDTO.Add((DTO.TaskDTO)job);
             }
+           
 
             return jobsDTO; 
         }
 
-      /// <summary> Creates a job. You can assign a job to yourself, or to staff on the farm if you role is manager or owner </summary>
+      /// <summary> Creates a job. You can assign a job to yourself, or to staff at this organisation if you role is manager or owner </summary>
       /// <param name="newJob">Job to be added</param>
       /// <returns>200 if successfull, and ErrorResponce Otherwise</returns>
-        public async Task<dynamic> Post([FromBody] Job newJob)
+        public async Task<dynamic> Post([FromBody] DTO.TaskDTO newJob)
         {
             HttpResponseMessage responce = Utils.CheckModel(newJob, Request);
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var theField = await db.Fields.Where(f => f.Id == newJob.onFieldId).Include(f => f.OnFarm).Include(f => f.OnFarm.Bonds).FirstOrDefaultAsync(); 
+            var theField = await db.Fields.Where(f => f.Id == newJob.onFieldId).Include(f => f.Org).Include(f => f.Org.Bonds).FirstOrDefaultAsync(); 
 
             if(theField == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            if(theField.OnFarm.Bonds.Any(p => p.PersonID == newJob.assignedToId))
+            if(! theField.Org.Bonds.Any(p => p.PersonID == newJob.assignedToId))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
-            string role = FarmsController.FindAndGetRole(theField.OnFarm, UserId);
+            string role = OrganisationController.FindAndGetRole(theField.Org, UserId);
             bool editRights = BondDb.CanAssignJobsToOthers.Contains(role);
             bool requestAuthorised = false; 
 
@@ -103,12 +127,12 @@ namespace HiveServer.Controllers
                 Deleted = false
             };
 
-            eventLog.Add(new JobEvent((Job)job, UserId, "Job crated"));
+            eventLog.Add(new TaskEvent((DTO.TaskDTO)job, UserId, "Job crated"));
             job.EventLog = JsonConvert.SerializeObject(eventLog);
 
             if (requestAuthorised)
             {
-                db.Jobs.Add(job);
+                db.Tasks.Add(job);
                 await db.SaveChangesAsync();
 
                 return Ok();
@@ -117,11 +141,13 @@ namespace HiveServer.Controllers
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
         }
 
-        /// <summary> Edits a job that already exists </summary>
+        /// <summary> Edits a job that already exists, according to the following truth-table
+
+        /// </summary>
         /// <param name="id">Id of the job you want to alter</param>
         /// <param name="newJob">Job to be added</param>
         /// <returns></returns>
-        public async Task<dynamic> Put([FromUri] long id, [FromBody]  Job newJob)
+        public async Task<dynamic> Put([FromUri] long id, [FromBody]  DTO.TaskDTO newJob)
         {
             bool EditsMade = false;
             bool TimeAdded = false;
@@ -136,17 +162,17 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var oldJob = await db.Jobs.Where(f => f.Id == id).Include(f => f.onField)
-                .Include(f => f.onField.OnFarm).Include(f => f.onField.OnFarm.Bonds).FirstOrDefaultAsync();
+            var oldJob = await db.Tasks.Where(f => f.Id == id).Include(f => f.onField)
+                .Include(f => f.onField.Org).Include(f => f.onField.Org.Bonds).FirstOrDefaultAsync();
 
             if (oldJob == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            if (oldJob.onField.OnFarm.Bonds.Any(p => p.PersonID == newJob.assignedToId))
+            if (oldJob.onField.Org.Bonds.Any(p => p.PersonID == newJob.assignedToId))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
             //Setup variables
-            string role = FarmsController.FindAndGetRole(oldJob.onField.OnFarm, UserId);
+            string role = OrganisationController.FindAndGetRole(oldJob.onField.Org, UserId);
             editRights = BondDb.CanAssignJobsToOthers.Contains(role);
             assignedtoSelf = oldJob.assignedToId == UserId  || (editRights && newJob.assignedToId == UserId);
             TimeAdded = oldJob.timeSpent < newJob.timeSpent;
@@ -177,12 +203,12 @@ namespace HiveServer.Controllers
 
 
 
-            eventLog = JsonConvert.DeserializeObject <List<JobEvent>>(oldJob.EventLog); 
+            eventLog = JsonConvert.DeserializeObject <List<TaskEvent>>(oldJob.EventLog); 
 
             
 
-            if (oldJob.timeSpent != newJob.timeSpent)
-            { }
+            //if (oldJob.timeSpent != newJob.timeSpent)
+            //{ }
 
             oldJob.name = newJob.name;
             oldJob.jobDescription = newJob.jobDescription;
@@ -193,7 +219,7 @@ namespace HiveServer.Controllers
             oldJob.Deleted = newJob.Deleted;            
             oldJob.assignedToId = newJob.assignedToId;
 
-            var it = new JobEvent((Job)oldJob, UserId);
+            var it = new TaskEvent((DTO.TaskDTO)oldJob, UserId);
             eventLog.Add(it); 
 
             oldJob.EventLog = JsonConvert.SerializeObject(eventLog);
@@ -209,15 +235,15 @@ namespace HiveServer.Controllers
         {
 
 
-            var oldJob = await db.Jobs.Where(f => f.Id == id).Include(f => f.onField)
-                .Include(f => f.onField.OnFarm).Include(f => f.onField.OnFarm.Bonds).FirstOrDefaultAsync();
+            var oldJob = await db.Tasks.Where(f => f.Id == id).Include(f => f.onField)
+                .Include(f => f.onField.Org).Include(f => f.onField.Org.Bonds).FirstOrDefaultAsync();
 
             if (oldJob == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
 
             //Setup variables
-            string role = FarmsController.FindAndGetRole(oldJob.onField.OnFarm, UserId);
+            string role = OrganisationController.FindAndGetRole(oldJob.onField.Org, UserId);
             if (BondDb.CanAssignJobsToOthers.Contains(role))
             {
                 oldJob.Deleted = true;

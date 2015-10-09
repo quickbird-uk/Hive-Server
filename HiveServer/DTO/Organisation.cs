@@ -6,11 +6,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HiveServer.DTO
 {
-    public class Farm: Base.Entity ,  IValidatableObject
+    public class Organisation: Base.Entity ,  IValidatableObject
     {
         public string name { get; set; }
 
-        public string farmDescription { get; set; }
+        public string orgDescription { get; set; }
 
         public string role { get; set; }
 
@@ -18,11 +18,11 @@ namespace HiveServer.DTO
         {
             if (string.IsNullOrEmpty(name))
             {
-                yield return new ValidationResult("Provide name for the farm please");
+                yield return new ValidationResult("Provide name for the organisation please");
             }
-            if (string.IsNullOrEmpty(farmDescription))
+            if (string.IsNullOrEmpty(orgDescription))
             {
-                farmDescription = string.Empty;
+                orgDescription = string.Empty;
             }
             if (Version == null || Version.Count() < 5)
             {
@@ -30,18 +30,18 @@ namespace HiveServer.DTO
             }
         }
 
-        public static explicit operator Farm(Models.FarmData.BondDb v)
+        public static explicit operator Organisation(Models.FarmData.BondDb v)
         {
-            var result = new Farm
+            var result = new Organisation
             {
-                Id = v.Farm.Id,
-                name = v.Farm.Name,
-                farmDescription = v.Farm.Description,
-                CreatedAt = v.Farm.CreatedAt,
-                UpdatedAt = v.Farm.UpdatedAt,
+                Id = v.Organisation.Id,
+                name = v.Organisation.Name,
+                orgDescription = v.Organisation.Description,
+                CreatedAt = v.Organisation.CreatedAt,
+                UpdatedAt = v.Organisation.UpdatedAt,
                 role = v.Role,
                 Version = v.Version,
-                Deleted = v.Farm.Deleted
+                Deleted = v.Organisation.Deleted
             };
             return result;
         }

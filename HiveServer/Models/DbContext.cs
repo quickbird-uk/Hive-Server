@@ -17,10 +17,10 @@ namespace HiveServer.Models
         public DbSet<ContactDb> Contacts { get; set; }
         public DbSet<BondDb> Bindings { get; set; }
 
-        public DbSet<FarmDb> Farms { get; set; }
+        public DbSet<OrganisationDb> Organisations { get; set; }
         public DbSet<FieldDb> Fields { get; set; }
 
-        public DbSet<JobDb> Jobs { get; set; }
+        public DbSet<JobDb> Tasks { get; set; }
 
         public ApplicationDbContext() : base("DefaultConnection")
         {   Configuration.LazyLoadingEnabled = true;    }
@@ -40,10 +40,10 @@ namespace HiveServer.Models
             new IndexAnnotation(new IndexAttribute("IX_PhoneNumber", 1) { IsUnique = true })); 
 
 
-            //COnfigure the User-Farm Bound
+            //COnfigure the User-organisation Bond
             modelBuilder.Entity<ApplicationUser>().ToTable("People");
             modelBuilder.Entity<ApplicationUser>().HasMany(p => p.Bound).WithRequired(p => p.Person);
-            modelBuilder.Entity<FarmDb>().HasMany(p => p.Bonds).WithRequired(p => p.Farm);
+            modelBuilder.Entity<OrganisationDb>().HasMany(p => p.Bonds).WithRequired(p => p.Organisation);
 
 
             modelBuilder.Entity<BondDb>().ToTable("Bindings");
@@ -62,13 +62,13 @@ namespace HiveServer.Models
 
 
             //configure Fields
-            modelBuilder.Entity<FarmDb>().HasMany(p => p.Fields).WithRequired(f => f.OnFarm);
-            modelBuilder.Entity<FarmDb>().ToTable("Farms");
+            modelBuilder.Entity<OrganisationDb>().HasMany(p => p.Fields).WithRequired(f => f.Org);
+            modelBuilder.Entity<OrganisationDb>().ToTable("Organisations");
 
             modelBuilder.Entity<FieldDb>().ToTable("Fields");
 
             //configure jobs
-            modelBuilder.Entity<JobDb>().ToTable("Jobs");
+            modelBuilder.Entity<JobDb>().ToTable("Tasks");
             modelBuilder.Entity<JobDb>().HasRequired(j => j.assignedBy).WithMany(p => p.JobsGiven).WillCascadeOnDelete(false);
             modelBuilder.Entity<JobDb>().HasRequired(j => j.assignedTo).WithMany(p => p.JobsRecieved).WillCascadeOnDelete(false);
             modelBuilder.Entity<JobDb>().HasRequired(j => j.onField).WithMany(f => f.Jobs).WillCascadeOnDelete(false);

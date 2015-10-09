@@ -37,7 +37,7 @@ namespace HiveServer.Models
         public byte[] OTPSecret { get; set; }
 
         /// <summary>
-        /// The list of farms the person is related to
+        /// The list of organisations the person is related to
         /// </summary>
         public virtual List<BondDb> Bound { get; set; }
 

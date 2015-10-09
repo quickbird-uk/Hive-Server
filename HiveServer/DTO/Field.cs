@@ -15,7 +15,7 @@ namespace HiveServer.DTO
 
         public string fieldDescription { get; set; }
 
-        public long atFarm { get; set; }
+        public long onOrg { get; set; }
 
         
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -32,9 +32,9 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }
-            if (atFarm == 0)
+            if (onOrg == 0)
             {
-                yield return new ValidationResult("You must provide the farm, to which the field is attached");
+                yield return new ValidationResult("You must provide the organisation, to which the field is attached");
             }
             if (Id == 0)
             {
@@ -49,7 +49,7 @@ namespace HiveServer.DTO
             return new Field
             {
                 Id = v.Id,
-                atFarm = v.OnFarmId,
+                onOrg = v.OnOrgId,
                 name = v.Name,
                 size = v.size,
                 fieldDescription = v.FieldDescription,

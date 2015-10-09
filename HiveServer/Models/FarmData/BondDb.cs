@@ -7,7 +7,7 @@ using System.Web;
 namespace HiveServer.Models.FarmData
 {
     /// <summary>
-    /// Bidnings link people to Farms, the type of binding dictates if it's an agicultural worker or owner of the property
+    /// Bidnings link people to Organisations, the type of binding dictates if it's an agicultural worker or owner of the property
     /// </summary>
     public class BondDb : Base.Entity
     {
@@ -18,11 +18,11 @@ namespace HiveServer.Models.FarmData
         /// <summary>
         /// Recommended constructor to use when creating a bond through a user
         /// </summary>
-        /// <param name="Farm"></param>
+        /// <param name="Organisation"></param>
         /// <param name="BondType"></param>
-        public BondDb(FarmDb farm, string role)
+        public BondDb(OrganisationDb organisation, string role)
         {
-            Farm = farm;
+            Organisation = organisation;
             Role = role;
 
         }
@@ -31,11 +31,11 @@ namespace HiveServer.Models.FarmData
 
         public virtual ApplicationUser Person { get; set; }
 
-        public long FarmID { get; set; }
+        public long OrganisationID { get; set; }
 
-        public virtual FarmDb Farm { get; set; }
+        public virtual OrganisationDb Organisation { get; set; }
 
-        /// <summary> Explains the relationship between the person and the farm. THere are Mangers, Agronomists and Crew. ALl have different privilages.  </summary>
+        /// <summary> Explains the relationship between the person and the Organisation. THere are Mangers, Agronomists and Crew. ALl have different privilages.  </summary>
         public string Role { get; set; }
 
         public const string RoleOwner = "Own";
@@ -48,7 +48,7 @@ namespace HiveServer.Models.FarmData
 
         public static readonly string[] CanAssignJobsToOthers = { RoleOwner, RoleManager, RoleSpecialist };
         public static readonly string[] CanManageStaff = { RoleOwner, RoleManager};
-        public static readonly string[] CanEditFarm = { RoleOwner};
+        public static readonly string[] CanEditOrganisation = { RoleOwner};
 
     }
 

@@ -6,9 +6,9 @@ using System.Web;
 
 namespace HiveServer.DTO
 {
-    public class JobEvent
+    public class TaskEvent
     {
-        public JobEvent(Job job, long userId, string title = "Changes where made by")
+        public TaskEvent(TaskDTO job, long userId, string title = "Changes where made by")
         {
             Title = title;
             Timestamp = DateTime.UtcNow;

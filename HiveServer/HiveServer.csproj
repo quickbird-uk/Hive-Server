@@ -176,13 +176,13 @@
   <ItemGroup>
     <Compile Include="Base\LoginUtils.cs" />
     <Compile Include="Base\Utils.cs" />
-    <Compile Include="Controllers\JobsController.cs" />
+    <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Controllers\FieldsController.cs" />
     <Compile Include="Controllers\StaffController.cs" />
     <Compile Include="Controllers\FarmsController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="DTO\Account\SMSRequest.cs" />
-    <Compile Include="DTO\JobEvent.cs" />
+    <Compile Include="DTO\TaskEvent.cs" />
     <Compile Include="Migrations\201509231642124_Initial.cs" />
     <Compile Include="Migrations\201509231642124_Initial.Designer.cs">
       <DependentUpon>201509231642124_Initial.cs</DependentUpon>
@@ -241,9 +241,9 @@
     <Compile Include="Base\Address.cs" />
     <Compile Include="DTO\Contact.cs" />
     <Compile Include="DTO\ErrorResponce.cs" />
-    <Compile Include="DTO\Farm.cs" />
+    <Compile Include="DTO\Organisation.cs" />
     <Compile Include="DTO\Field.cs" />
-    <Compile Include="DTO\Job.cs" />
+    <Compile Include="DTO\Task.cs" />
     <Compile Include="DTO\Account\LoginRequest.cs" />
     <Compile Include="DTO\Account\RegistrationRequest.cs" />
     <Compile Include="DTO\Staff.cs" />
@@ -257,10 +257,10 @@
     <Compile Include="Base\Entity.cs" />
     <Compile Include="Models\ContactDb.cs" />
     <Compile Include="Models\FarmData\BondDb.cs" />
-    <Compile Include="Models\FarmData\FarmDb.cs" />
+    <Compile Include="Models\FarmData\OrganisationDb.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
     <Compile Include="Models\FarmData\FieldDb.cs" />
-    <Compile Include="Models\FarmData\JobDb.cs" />
+    <Compile Include="Models\FarmData\TaskDb.cs" />
     <Compile Include="Models\identityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />

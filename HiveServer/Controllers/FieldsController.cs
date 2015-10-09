@@ -21,18 +21,18 @@ namespace HiveServer.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        /// <summary> gets a list of fields. Does not include the ones that were soft-deleted </summary>
+        /// <summary> gets a list of fields. Includes the ones that were soft-deleted</summary>
         /// <returns></returns>
         [ResponseType(typeof(List<Field>))]
         public async Task<dynamic> Get()
         {
             var userId = long.Parse(User.Identity.GetUserId());
-            List<FieldDb>[] farmFieldList = await db.Bindings.Where(b => b.PersonID == userId && b.Deleted == false)
-                .Select(f => f.Farm).Select(f => f.Fields).ToArrayAsync();
+            List<FieldDb>[] orgFieldList = await db.Bindings.Where(b => b.PersonID == userId)
+                .Select(f => f.Organisation).Select(f => f.Fields).ToArrayAsync();
 
             var fieldsDto = new List<Field>();
 
-            foreach(var fieldList in farmFieldList)
+            foreach(var fieldList in orgFieldList)
             {
                 foreach (var field in fieldList)
                 {
@@ -45,7 +45,7 @@ namespace HiveServer.Controllers
 
 
 
-        /// <summary> Creates a new field on a spesified farm if the user has the right permissions </summary>
+        /// <summary> Creates a new field on a spesified organisation if the user has the right permissions </summary>
         /// <param name="newField">returns 200 if successfull, or ErrorResponce</param>
         public async Task<dynamic> Post([FromBody] Field newField)
         {
@@ -55,7 +55,7 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var bond = await FarmsController.GetThisBondAndFarm(userId, newField.atFarm, db); 
+            var bond = await OrganisationController.GetThisBondAnOrg(userId, newField.onOrg, db); 
 
             if(bond == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist);}
@@ -65,7 +65,7 @@ namespace HiveServer.Controllers
 
             FieldDb newFieldDB = new FieldDb
             {
-                OnFarmId = newField.atFarm,
+                OnOrgId = newField.onOrg,
                 Name = newField.name,
                 FieldDescription = newField.fieldDescription
             };
@@ -76,7 +76,7 @@ namespace HiveServer.Controllers
         }
 
         /// <summary>
-        /// You can alter the farm's name and description, if you are the owner.  You can also Undelete a farm, by setting Deleted to false
+        /// You can alter the field's name and description, if you are the owner of the organisation.  You can also Undelete a field, by setting Deleted to false
         /// </summary>
         /// <param name="id">Id of the field</param>
         /// <param name="newField">The field object</param>
@@ -89,14 +89,14 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var field = await db.Fields.Where(f => f.Id == id).Include(f => f.OnFarm).Include(f => f.OnFarm.Bonds).FirstOrDefaultAsync();
-            var farm = field?.OnFarm;
-            var staff = farm?.Bonds;
+            var field = await db.Fields.Where(f => f.Id == id).Include(f => f.Org).Include(f => f.Org.Bonds).FirstOrDefaultAsync();
+            var organisation = field?.Org;
+            var staff = organisation?.Bonds;
 
             if(field == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            string role = FarmsController.FindAndGetRole(farm, userId); 
+            string role = OrganisationController.FindAndGetRole(organisation, userId); 
 
             if(role != BondDb.RoleManager)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
@@ -105,7 +105,7 @@ namespace HiveServer.Controllers
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             //for now we do not allow people ot move fields. That could change later. 
-            if (field.OnFarmId != newField.atFarm)
+            if (field.OnOrgId != newField.onOrg)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             field.Name = newField.name;
@@ -128,14 +128,14 @@ namespace HiveServer.Controllers
         {
             var userId = long.Parse(User.Identity.GetUserId());
 
-            var field = await db.Fields.Where(f => f.Id == id).Include(f => f.OnFarm).Include(f => f.OnFarm.Bonds).FirstOrDefaultAsync();
-            var farm = field?.OnFarm;
-            var staff = farm?.Bonds;
+            var field = await db.Fields.Where(f => f.Id == id).Include(f => f.Org).Include(f => f.Org.Bonds).FirstOrDefaultAsync();
+            var organisation = field?.Org;
+            var staff = organisation?.Bonds;
 
             if (field == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            string role = FarmsController.FindAndGetRole(farm, userId);
+            string role = OrganisationController.FindAndGetRole(organisation, userId);
 
             if (role != BondDb.RoleManager)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }

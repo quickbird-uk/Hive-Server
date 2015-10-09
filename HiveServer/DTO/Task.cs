@@ -8,7 +8,7 @@ using System.Web;
 
 namespace HiveServer.DTO
 {
-    public class Job : Base.Entity, IValidatableObject
+    public class TaskDTO : Base.Entity, IValidatableObject
     {
         public string name { get; set; }
         public string jobDescription { get; set; }
@@ -25,7 +25,7 @@ namespace HiveServer.DTO
 
         public DateTime DueDate { get; set; }
 
-        public virtual List<JobEvent> Events { get; set; }
+        public virtual List<TaskEvent> Events { get; set; }
 
         public string state { get; set; }
 
@@ -34,15 +34,15 @@ namespace HiveServer.DTO
         public TimeSpan timeSpent { get; set; }
 
 
-        public Job ()
+        public TaskDTO ()
         {
-            Events = new List<JobEvent>();
+            Events = new List<TaskEvent>();
             
         }
 
-        public static explicit operator Job(Models.JobDb v)
+        public static explicit operator TaskDTO(Models.JobDb v)
         {
-            Job dto =  new Job
+            TaskDTO dto =  new TaskDTO
             {
                 Id = v.Id,
                 name = v.name,
@@ -64,7 +64,7 @@ namespace HiveServer.DTO
                 Deleted = v.Deleted
             };
 
-            dto.Events = JsonConvert.DeserializeObject<List<JobEvent>>(v.EventLog);
+            dto.Events = JsonConvert.DeserializeObject<List<TaskEvent>>(v.EventLog);
 
             return dto; 
         }

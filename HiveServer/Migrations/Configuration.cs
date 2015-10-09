@@ -80,68 +80,68 @@ namespace HiveServer.Migrations
 
             });
 
-            if (!context.Farms.Any()) //seed if there are no farms 
+            if (!context.Organisations.Any()) //seed if there are no organisation 
             {
                 emptyDatabase = true;
-                List<FarmDb> AllFarms = new List<FarmDb>();
+                List<OrganisationDb> AllOrgs = new List<OrganisationDb>();
 
                 //Give every user a farm! 
                 foreach (var user in users)
                 {
-                    var farm = new FarmDb(user.FirstName + "'s Farm");
+                    var org = new OrganisationDb(user.FirstName + "'s Farm");
                     var bond = new BondDb
                     {
                         Role = BondDb.RoleOwner,
-                        Farm = farm
+                        Organisation = org
                     };
 
-                    context.Farms.Add(farm);
+                    context.Organisations.Add(org);
                     user.Bound.Add(bond);
 
-                    AllFarms.Add(farm); //put all the farms into a list to add fields later
+                    AllOrgs.Add(org); //put all the organisation into a list to add fields later
                 }
 
                 //Make user 2 (ash) someone an agronomist working ofr everyone
                 foreach (var user in users)
                 {
-                    if(user.Id != users[2].Id) //can;t add another relationship to his own farm
+                    if(user.Id != users[2].Id) //can;t add another relationship to his own organisation
                     {
                         users[2].Bound.Add(new BondDb
                         {
-                            Farm = user.Bound[0].Farm,
+                            Organisation = user.Bound[0].Organisation,
                             Role = BondDb.RoleSpecialist
                         });
                     }
                 }
 
-                //Add some crew to vlad's farm
+                //Add some crew to vlad's organisation
                 {
                     users[0].Bound.Add(new BondDb
                     {
-                        Farm = users[4].Bound[0].Farm,
+                        Organisation = users[4].Bound[0].Organisation,
                         Role = BondDb.RoleCrew
                     });
                     users[1].Bound.Add(new BondDb
                     {
-                        Farm = users[4].Bound[0].Farm,
+                        Organisation = users[4].Bound[0].Organisation,
                         Role = BondDb.RoleCrew
                     });
                     users[5].Bound.Add(new BondDb
                     {
-                        Farm = users[4].Bound[0].Farm,
+                        Organisation = users[4].Bound[0].Organisation,
                         Role = BondDb.RoleCrew
                     });
                     users[3].Bound.Add(new BondDb
                     {
-                        Farm = users[4].Bound[0].Farm,
+                        Organisation = users[4].Bound[0].Organisation,
                         Role = BondDb.RoleCrew
                     });
                 }
 
                 Random RNG = new Random();
 
-                //Create some fields for each farm
-                foreach (var farm in AllFarms)
+                //Create some fields for each organisation
+                foreach (var org in AllOrgs)
                 {
                     int nOfFields = RNG.Next(3, 20);
                     double fieldSize = 0;
@@ -154,7 +154,7 @@ namespace HiveServer.Migrations
                     for (int i = 0; i < nOfFields; i++)
                     {
 
-                        farm.Fields.Add(new FieldDb {
+                        org.Fields.Add(new FieldDb {
                             Name = crops[RNG.Next(11)],
                             size = Math.Round(RNG.Next(2, 6) * fieldSize, 1)
                        }
@@ -170,6 +170,7 @@ namespace HiveServer.Migrations
                     user.SecurityStamp = Guid.NewGuid().ToString("D");
                     user.PasswordHash = passwordHasher.HashPassword("Password1");
                     user.OTPSecret = Base.LoginUtils.generateSalt();
+                    user.PhoneNumberConfirmed = true; 
                 }
 
                 //generate a list of contacts for each user in the DB

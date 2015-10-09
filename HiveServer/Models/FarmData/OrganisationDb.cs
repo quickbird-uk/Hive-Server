@@ -16,17 +16,17 @@ using HiveServer.DTO;
 
 namespace HiveServer.Models
 {
-    public class FarmDb : Base.Entity
+    public class OrganisationDb : Base.Entity
     {
 
 
-        public FarmDb()
+        public OrganisationDb()
         {
             Bonds = new List<BondDb>();
             Fields = new List<FieldDb>();
         }
 
-        public FarmDb(string inName, string inDesctiption = "")
+        public OrganisationDb(string inName, string inDesctiption = "")
         {
             Name = inName;
             Description = inDesctiption;
@@ -69,7 +69,7 @@ namespace HiveServer.Models
             return SelectBonds(BondDb.RoleCrew);
         }
 
-        /// <summary>  Gets all the people working on this farm  </summary>
+        /// <summary>  Gets all the people working for this organisation  </summary>
         public List<ApplicationUser> getAllPeople()
         {
             return SelectBonds();
