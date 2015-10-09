@@ -40,7 +40,7 @@ namespace HiveServer.DTO
             
         }
 
-        public static explicit operator TaskDTO(Models.JobDb v)
+        public static explicit operator TaskDTO(Models.TaskDb v)
         {
             TaskDTO dto =  new TaskDTO
             {
@@ -64,7 +64,9 @@ namespace HiveServer.DTO
                 Deleted = v.Deleted
             };
 
-            dto.Events = JsonConvert.DeserializeObject<List<TaskEvent>>(v.EventLog);
+
+            dto.Events = JsonConvert.DeserializeObject<List<TaskEvent>>(v.EventLog) ?? null;
+            
 
             return dto; 
         }
@@ -108,7 +110,7 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("You must provide ID of the assignee");
             }
-            if(JobDb.ValidStates.Contains(state))
+            if(TaskDb.ValidStates.Contains(state))
             {
                 yield return new ValidationResult("You did not provide a valid state");
             }

@@ -179,26 +179,19 @@
     <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Controllers\FieldsController.cs" />
     <Compile Include="Controllers\StaffController.cs" />
-    <Compile Include="Controllers\FarmsController.cs" />
+    <Compile Include="Controllers\OrganisationsController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="DTO\Account\SMSRequest.cs" />
     <Compile Include="DTO\TaskEvent.cs" />
-    <Compile Include="Migrations\201509231642124_Initial.cs" />
-    <Compile Include="Migrations\201509231642124_Initial.Designer.cs">
-      <DependentUpon>201509231642124_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201510091610134_Initial.cs" />
+    <Compile Include="Migrations\201510091610134_Initial.Designer.cs">
+      <DependentUpon>201510091610134_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201509252027578_Fixed Jobs.cs" />
-    <Compile Include="Migrations\201509252027578_Fixed Jobs.Designer.cs">
-      <DependentUpon>201509252027578_Fixed Jobs.cs</DependentUpon>
+    <Compile Include="Migrations\201510091617361_CHengedFieldId.cs" />
+    <Compile Include="Migrations\201510091617361_CHengedFieldId.Designer.cs">
+      <DependentUpon>201510091617361_CHengedFieldId.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201509281306553_AddedEventsToJobs.cs" />
-    <Compile Include="Migrations\201509281306553_AddedEventsToJobs.Designer.cs">
-      <DependentUpon>201509281306553_AddedEventsToJobs.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201509281404492_AddedEventsToJobs1.cs" />
-    <Compile Include="Migrations\201509281404492_AddedEventsToJobs1.Designer.cs">
-      <DependentUpon>201509281404492_AddedEventsToJobs1.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="SMSService.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -250,7 +243,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="DTO\Account\AccountBindingModels.cs" />
     <Compile Include="DTO\Account\AccountViewModels.cs" />
     <Compile Include="Models\DbContext.cs" />
@@ -340,17 +332,11 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201509231642124_Initial.resx">
-      <DependentUpon>201509231642124_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201510091610134_Initial.resx">
+      <DependentUpon>201510091610134_Initial.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201509252027578_Fixed Jobs.resx">
-      <DependentUpon>201509252027578_Fixed Jobs.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201509281306553_AddedEventsToJobs.resx">
-      <DependentUpon>201509281306553_AddedEventsToJobs.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201509281404492_AddedEventsToJobs1.resx">
-      <DependentUpon>201509281404492_AddedEventsToJobs1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201510091617361_CHengedFieldId.resx">
+      <DependentUpon>201510091617361_CHengedFieldId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -49,7 +49,7 @@ namespace HiveServer.DTO
             return new Field
             {
                 Id = v.Id,
-                onOrg = v.OnOrgId,
+                onOrg = v.OrgId,
                 name = v.Name,
                 size = v.size,
                 fieldDescription = v.FieldDescription,

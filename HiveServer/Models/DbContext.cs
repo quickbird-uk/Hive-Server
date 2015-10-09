@@ -20,7 +20,7 @@ namespace HiveServer.Models
         public DbSet<OrganisationDb> Organisations { get; set; }
         public DbSet<FieldDb> Fields { get; set; }
 
-        public DbSet<JobDb> Tasks { get; set; }
+        public DbSet<TaskDb> Tasks { get; set; }
 
         public ApplicationDbContext() : base("DefaultConnection")
         {   Configuration.LazyLoadingEnabled = true;    }
@@ -68,13 +68,16 @@ namespace HiveServer.Models
             modelBuilder.Entity<FieldDb>().ToTable("Fields");
 
             //configure jobs
-            modelBuilder.Entity<JobDb>().ToTable("Tasks");
-            modelBuilder.Entity<JobDb>().HasRequired(j => j.assignedBy).WithMany(p => p.JobsGiven).WillCascadeOnDelete(false);
-            modelBuilder.Entity<JobDb>().HasRequired(j => j.assignedTo).WithMany(p => p.JobsRecieved).WillCascadeOnDelete(false);
-            modelBuilder.Entity<JobDb>().HasRequired(j => j.onField).WithMany(f => f.Jobs).WillCascadeOnDelete(false);
-            modelBuilder.Entity<JobDb>().Property(j => j.name).IsRequired();
-            modelBuilder.Entity<JobDb>().Property(j => j.state).IsRequired().IsFixedLength().HasMaxLength(3); 
-            modelBuilder.Entity<JobDb>().Property(j => j.type).IsRequired();
+            modelBuilder.Entity<TaskDb>().ToTable("Tasks");
+            modelBuilder.Entity<TaskDb>().HasRequired(j => j.assignedBy).WithMany(p => p.JobsGiven).WillCascadeOnDelete(false);
+            modelBuilder.Entity<TaskDb>().HasRequired(j => j.assignedTo).WithMany(p => p.JobsRecieved).WillCascadeOnDelete(false);
+            modelBuilder.Entity<TaskDb>().HasRequired(j => j.onField).WithMany(f => f.Jobs).WillCascadeOnDelete(false);
+            modelBuilder.Entity<TaskDb>().Property(j => j.name).IsRequired();
+            modelBuilder.Entity<TaskDb>().Property(j => j.state).IsRequired(); // .IsFixedLength().HasMaxLength(3)
+            modelBuilder.Entity<TaskDb>().Property(j => j.type).IsRequired();
+            modelBuilder.Entity<TaskDb>().Property(j => j.DateFinished).HasColumnType("datetime2");
+            modelBuilder.Entity<TaskDb>().Property(j => j.DueDate).HasColumnType("datetime2");
+
 
         }
 

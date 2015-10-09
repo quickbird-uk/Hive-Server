@@ -17,7 +17,7 @@ namespace HiveServer.Controllers
 {
     [Authorize]
     [RoutePrefix("Organisations")]
-    public class OrganisationController : ApiController
+    public class OrganisationsController : ApiController
     {
 
 

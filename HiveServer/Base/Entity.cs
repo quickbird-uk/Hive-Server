@@ -26,6 +26,7 @@ namespace HiveServer.Base
         /// <summary> Spesifies when it was created for the first time </summary>
         public DateTimeOffset? CreatedAt { get; set; }
 
+
         /// <summary> Spesifies when this entity was updated for the last time </summary>
         public DateTimeOffset? UpdatedAt { get; set; }
 

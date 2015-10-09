@@ -41,15 +41,15 @@ namespace HiveServer.Models
         /// </summary>
         public virtual List<BondDb> Bound { get; set; }
 
-        public virtual List<JobDb> JobsGiven { get; set; }
+        public virtual List<TaskDb> JobsGiven { get; set; }
 
-        public virtual List<JobDb> JobsRecieved { get; set; }
+        public virtual List<TaskDb> JobsRecieved { get; set; }
 
         public ApplicationUser() 
         {
             Bound = new List<BondDb>();
-            JobsGiven = new List<JobDb>();
-            JobsRecieved = new List<JobDb>(); 
+            JobsGiven = new List<TaskDb>();
+            JobsRecieved = new List<TaskDb>(); 
         }
 
 

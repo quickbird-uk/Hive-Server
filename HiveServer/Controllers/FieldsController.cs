@@ -55,7 +55,7 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var bond = await OrganisationController.GetThisBondAnOrg(userId, newField.onOrg, db); 
+            var bond = await OrganisationsController.GetThisBondAnOrg(userId, newField.onOrg, db); 
 
             if(bond == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist);}
@@ -65,7 +65,8 @@ namespace HiveServer.Controllers
 
             FieldDb newFieldDB = new FieldDb
             {
-                OnOrgId = newField.onOrg,
+                OrgId = newField.onOrg,
+                Org = bond.Organisation,
                 Name = newField.name,
                 FieldDescription = newField.fieldDescription
             };
@@ -96,7 +97,7 @@ namespace HiveServer.Controllers
             if(field == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            string role = OrganisationController.FindAndGetRole(organisation, userId); 
+            string role = OrganisationsController.FindAndGetRole(organisation, userId); 
 
             if(role != BondDb.RoleManager)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
@@ -105,7 +106,7 @@ namespace HiveServer.Controllers
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             //for now we do not allow people ot move fields. That could change later. 
-            if (field.OnOrgId != newField.onOrg)
+            if (field.OrgId != newField.onOrg)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             field.Name = newField.name;
@@ -135,7 +136,7 @@ namespace HiveServer.Controllers
             if (field == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            string role = OrganisationController.FindAndGetRole(organisation, userId);
+            string role = OrganisationsController.FindAndGetRole(organisation, userId);
 
             if (role != BondDb.RoleManager)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }

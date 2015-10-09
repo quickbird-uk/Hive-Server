@@ -21,14 +21,18 @@ namespace HiveServer.Controllers
     public class TasksController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-        private long UserId;
-        private List<TaskEvent> eventLog = new List<TaskEvent>();
-        private readonly bool[][] Permissions = new bool[8][]; 
- 
 
-        public TasksController()
+        private List<TaskEvent> eventLog = new List<TaskEvent>();
+        private readonly bool[][] Permissions = new bool[8][];
+
+        bool TaskManagementRole = false;
+        bool AssignedToSelf = false;
+        bool AssignedBySelf = false;
+        bool AdvancedEdits = false;
+
+
+        public TasksController() : base()
         {
-            UserId = long.Parse(User.Identity.GetUserId());
             int i = 0;
             /// Right Columns indicate whether basic edits are allowed, and whether advanced edits are allowed. 
 
@@ -58,23 +62,31 @@ namespace HiveServer.Controllers
         [ResponseType(typeof(List<DTO.TaskDTO>))]
         public async Task<dynamic> Get()
         {
-            var relevantJobs =  await db.Organisations.Where(f => f.Bonds.Any(b => b.PersonID == UserId) && f.Deleted == false)
+            long UserId = long.Parse(User.Identity.GetUserId());
+
+            List<IEnumerable<List<TaskDb>>> relevantJobs =  await db.Organisations.Where(f => f.Bonds.Any(b => b.PersonID == UserId) && f.Deleted == false)
                 .Select(b => b.Fields.Where(f => f.Deleted == false).Select(d => d.Jobs)).ToListAsync();
 
-            var personalJobs = await db.Tasks.Where(j => j.assignedById == UserId || j.assignedToId == UserId).ToArrayAsync();
+            TaskDb[] personalJobs = await db.Tasks.Where(j => j.assignedById == UserId || j.assignedToId == UserId).ToArrayAsync();
 
-            List<DTO.TaskDTO> jobsDTO = new List<DTO.TaskDTO>(); 
-            
-            foreach(JobDb job in relevantJobs)
-            {
-                jobsDTO.Add((DTO.TaskDTO)job); 
-            }
-            foreach(JobDb job in personalJobs)
-            {
-                jobsDTO.Add((DTO.TaskDTO)job);
-            }
-           
+            List<DTO.TaskDTO> jobsDTO = new List<DTO.TaskDTO>();
 
+            foreach (IEnumerable<List<TaskDb>> step1 in relevantJobs)
+            {
+                foreach (List<TaskDb> step2 in step1)
+                {
+                    foreach (TaskDb task in step2)
+                    {
+                        jobsDTO.Add((DTO.TaskDTO)task);
+                    }
+                }
+            }
+            foreach(TaskDb job in personalJobs)
+            {
+                if(! jobsDTO.Exists(f => f.Id == job.Id))
+                    jobsDTO.Add((DTO.TaskDTO)job);
+            }
+                 
             return jobsDTO; 
         }
 
@@ -83,6 +95,8 @@ namespace HiveServer.Controllers
       /// <returns>200 if successfull, and ErrorResponce Otherwise</returns>
         public async Task<dynamic> Post([FromBody] DTO.TaskDTO newJob)
         {
+            long UserId = long.Parse(User.Identity.GetUserId());
+
             HttpResponseMessage responce = Utils.CheckModel(newJob, Request);
             if (!responce.IsSuccessStatusCode)
                 return responce;
@@ -95,7 +109,7 @@ namespace HiveServer.Controllers
             if(! theField.Org.Bonds.Any(p => p.PersonID == newJob.assignedToId))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
-            string role = OrganisationController.FindAndGetRole(theField.Org, UserId);
+            string role = OrganisationsController.FindAndGetRole(theField.Org, UserId);
             bool editRights = BondDb.CanAssignJobsToOthers.Contains(role);
             bool requestAuthorised = false; 
 
@@ -107,7 +121,7 @@ namespace HiveServer.Controllers
             if (newJob.assignedToId == UserId || editRights)
             { requestAuthorised = true; }
 
-            JobDb job = new JobDb
+            TaskDb job = new TaskDb
             {
                 name = newJob.name,
                 jobDescription = newJob.jobDescription,
@@ -141,119 +155,149 @@ namespace HiveServer.Controllers
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
         }
 
-        /// <summary> Edits a job that already exists, according to the following truth-table
-
-        /// </summary>
+        /// <summary> Edits a job that already exists, according to the truth Table. You can wind back time, we do not check for it. </summary>
         /// <param name="id">Id of the job you want to alter</param>
-        /// <param name="newJob">Job to be added</param>
+        /// <param name="newTask">Job to be added</param>
         /// <returns></returns>
-        public async Task<dynamic> Put([FromUri] long id, [FromBody]  DTO.TaskDTO newJob)
+        public async Task<dynamic> Put([FromUri] long id, [FromBody]  DTO.TaskDTO newTask)
         {
-            bool EditsMade = false;
+            bool AdvancedEdits = false;
+            long UserId = long.Parse(User.Identity.GetUserId());
             bool TimeAdded = false;
-            bool editRights = false;
-            bool assignedtoSelf = false;
             bool anythingChanged = false;
 
-            bool validEdit = false;
-
             //Check Data integrity
-            HttpResponseMessage responce = Utils.CheckModel(newJob, Request);
+            HttpResponseMessage responce = Utils.CheckModel(newTask, Request);
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var oldJob = await db.Tasks.Where(f => f.Id == id).Include(f => f.onField)
+            TaskDb oldTask = await db.Tasks.Where(f => f.Id == id).Include(f => f.onField)
                 .Include(f => f.onField.Org).Include(f => f.onField.Org.Bonds).FirstOrDefaultAsync();
 
-            if (oldJob == null)
+            if (oldTask == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            if (oldJob.onField.Org.Bonds.Any(p => p.PersonID == newJob.assignedToId))
+            if (! oldTask.onField.Org.Bonds.Any(p => p.PersonID == newTask.assignedToId))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
             //Setup variables
-            string role = OrganisationController.FindAndGetRole(oldJob.onField.Org, UserId);
-            editRights = BondDb.CanAssignJobsToOthers.Contains(role);
-            assignedtoSelf = oldJob.assignedToId == UserId  || (editRights && newJob.assignedToId == UserId);
-            TimeAdded = oldJob.timeSpent < newJob.timeSpent;
-            EditsMade = (oldJob.rate - newJob.rate) > 0.01 || oldJob.DueDate != newJob.DueDate || oldJob.assignedToId != newJob.assignedToId
-                || oldJob.type != newJob.type || oldJob.name != newJob.name || oldJob.jobDescription != newJob.jobDescription || oldJob.Deleted != newJob.Deleted;
-            anythingChanged = EditsMade || TimeAdded || newJob.state != oldJob.state; 
+            string role = OrganisationsController.FindAndGetRole(oldTask.onField.Org, UserId);
+            TaskManagementRole = BondDb.CanAssignJobsToOthers.Contains(role);
+
+
+            TimeAdded = oldTask.timeSpent < newTask.timeSpent;
+
+
+            anythingChanged = AdvancedEdits || TimeAdded || newTask.state != oldTask.state; 
 
             
             //Check user's access
             if (role == BondDb.RoleNone)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantView); }
 
-            //Accept the job
-            if (! editRights && !assignedtoSelf)
-            { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
-            ////Reject the job
-            //if ((oldJob.state == JobDb.StateAssigned || oldJob.state == JobDb.StatePending) && newJob.state == JobDb.StateAssigned && assignedtoSelf && !TimeAdded)
-            //    validEdit = true;
+            bool[] permission = Permissions.First(p => p[0] == TaskManagementRole && p[1] == AssignedToSelf && p[2] == AssignedBySelf);
 
-            ////going round the loop, doing the job
-            //if ((oldJob.state == JobDb.StateAssigned || oldJob.state == JobDb.StateInProgress || oldJob.state == JobDb.StatePaused || oldJob.state == JobDb.StatePending)
-            //    && (newJob.state == JobDb.StateFinished || newJob.state == JobDb.StatePaused || newJob.state == JobDb.StateInProgress)
-            //    && assignedtoSelf)
-            //{
-            //    validEdit = true;
-            //}
-
-
-
-            eventLog = JsonConvert.DeserializeObject <List<TaskEvent>>(oldJob.EventLog); 
+            if (! CheckPermission(TaskManagementRole, UserId, oldTask, newTask))
+            { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PermissionsTooLow); }
 
             
+            if (anythingChanged)
+            {
+                eventLog = JsonConvert.DeserializeObject<List<TaskEvent>>(oldTask.EventLog);
 
-            //if (oldJob.timeSpent != newJob.timeSpent)
-            //{ }
+                oldTask.name = newTask.name;
+                oldTask.jobDescription = newTask.jobDescription;
+                oldTask.rate = newTask.rate;
+                oldTask.state = newTask.state;
+                oldTask.DueDate = newTask.DueDate;
+                oldTask.timeSpent = newTask.timeSpent;
+                oldTask.Deleted = newTask.Deleted;
+                oldTask.assignedToId = newTask.assignedToId;
 
-            oldJob.name = newJob.name;
-            oldJob.jobDescription = newJob.jobDescription;
-            oldJob.rate = newJob.rate;
-            oldJob.state = newJob.state;
-            oldJob.DueDate = newJob.DueDate;
-            oldJob.timeSpent = newJob.timeSpent; 
-            oldJob.Deleted = newJob.Deleted;            
-            oldJob.assignedToId = newJob.assignedToId;
+                
+                eventLog.Add(new TaskEvent((DTO.TaskDTO)oldTask, UserId));
 
-            var it = new TaskEvent((DTO.TaskDTO)oldJob, UserId);
-            eventLog.Add(it); 
-
-            oldJob.EventLog = JsonConvert.SerializeObject(eventLog);
-            await db.SaveChangesAsync();
+                oldTask.EventLog = JsonConvert.SerializeObject(eventLog);
+                await db.SaveChangesAsync();
+            }
 
             return Ok(); 
         }
+
+     
 
         /// <summary> Not sure yet if we should delete it </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task<dynamic> Delete([FromUri] long id)
         {
+            long UserId = long.Parse(User.Identity.GetUserId());
 
-
-            var oldJob = await db.Tasks.Where(f => f.Id == id).Include(f => f.onField)
+            var oldTask = await db.Tasks.Where(f => f.Id == id).Include(f => f.onField)
                 .Include(f => f.onField.Org).Include(f => f.onField.Org.Bonds).FirstOrDefaultAsync();
 
-            if (oldJob == null)
+            if (oldTask == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-
             //Setup variables
-            string role = OrganisationController.FindAndGetRole(oldJob.onField.Org, UserId);
-            if (BondDb.CanAssignJobsToOthers.Contains(role))
+            string role = OrganisationsController.FindAndGetRole(oldTask.onField.Org, UserId);
+            TaskManagementRole = BondDb.CanAssignJobsToOthers.Contains(role); 
+
+            if (CheckPermission(TaskManagementRole, UserId, oldTask))
             {
-                oldJob.Deleted = true;
+                oldTask.Deleted = true;
+                eventLog = JsonConvert.DeserializeObject<List<TaskEvent>>(oldTask.EventLog);
+                var it = new TaskEvent((DTO.TaskDTO)oldTask, UserId, "Task was deleted");
+                eventLog.Add(it);
+                oldTask.EventLog = JsonConvert.SerializeObject(eventLog);
+                await db.SaveChangesAsync();
                 return Ok();
             }
             else
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PermissionsTooLow); ;
         }
 
+        private bool CheckPermission(bool taskManagementRole, long UserId, TaskDb oldTask = null, TaskDTO newTask = null)
+        {
+            TaskDTO task1 = (TaskDTO)oldTask ?? null;
+            TaskDTO task2 = newTask ?? null;
+            //use local variables to avoid problems
+            bool assignedToSelf = false;
+            bool assignedBySelf = false;
+            bool advancedEdits = false; 
 
+            if(task1 != null && task2 == null)
+            { task1 = task2; }
+            else if(task2 != null && task1 == null)
+            { task2 = task1; }
+            else if(task1 != null && task2 != null)
+            { //Good!
+            }
+            else
+            {
+                throw new Exception("In the Task Controller, both new and old Tasks are null!");
+            }
+
+            //You have to check if the new and old job are both self-assigned. Otherwise the user will have admin right over the job abd be able to assign it to someone else
+            assignedToSelf = task1.assignedToId == UserId && task2.assignedToId == UserId;
+            assignedBySelf = task1.assignedById == UserId && task2.assignedById == UserId;
+
+            advancedEdits = (task1.rate - task2.rate) > 0.01 || task1.DueDate != task2.DueDate || task1.assignedToId != task2.assignedToId
+            || task1.type != task2.type || task1.name != task2.name || task1.jobDescription != task2.jobDescription || task1.Deleted != task2.Deleted;
+
+            bool[] permission = Permissions.First(p => p[0] == taskManagementRole && p[1] == assignedToSelf && p[2] == assignedBySelf);
+
+            //move local to global variables
+            AssignedToSelf = assignedToSelf;
+            AssignedBySelf = assignedBySelf;
+            AdvancedEdits = advancedEdits; 
+
+            if (AdvancedEdits)
+                return permission[4];
+            else
+                return permission[3];
+        }
 
 
 

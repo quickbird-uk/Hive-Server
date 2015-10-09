@@ -34,13 +34,13 @@ namespace HiveServer.Migrations
                 FirstName = "Nobody",
                 LastName = "Nobody",
                 PhoneNumber = 0000000000,
-
+   
             });
 
             users.Add(new ApplicationUser
             {
                 FirstName = "Winston",
-                LastName = "Chirchill",
+                LastName = "Chirchill", 
                 PhoneNumber = 666666,
                 Email = "win@uk",
 
@@ -104,7 +104,7 @@ namespace HiveServer.Migrations
                 //Make user 2 (ash) someone an agronomist working ofr everyone
                 foreach (var user in users)
                 {
-                    if (user.Id != users[2].Id) //can;t add another relationship to his own organisation
+                    if(user.Id != users[2].Id) //can;t add another relationship to his own organisation
                     {
                         users[2].Bound.Add(new BondDb
                         {
@@ -154,11 +154,10 @@ namespace HiveServer.Migrations
                     for (int i = 0; i < nOfFields; i++)
                     {
 
-                        org.Fields.Add(new FieldDb
-                        {
+                        org.Fields.Add(new FieldDb {
                             Name = crops[RNG.Next(11)],
                             size = Math.Round(RNG.Next(2, 6) * fieldSize, 1)
-                        }
+                       }
                        );
                     }
 
@@ -167,11 +166,11 @@ namespace HiveServer.Migrations
 
                 foreach (var user in users)
                 {
-                    user.UserName = Guid.NewGuid().ToString();
+                    user.UserName = Guid.NewGuid().ToString(); 
                     user.SecurityStamp = Guid.NewGuid().ToString("D");
                     user.PasswordHash = passwordHasher.HashPassword("Password1");
                     user.OTPSecret = Base.LoginUtils.generateSalt();
-                    user.PhoneNumberConfirmed = true;
+                    user.PhoneNumberConfirmed = true; 
                 }
 
                 //generate a list of contacts for each user in the DB
@@ -217,5 +216,6 @@ namespace HiveServer.Migrations
             }
 
         }
+
     }
 }

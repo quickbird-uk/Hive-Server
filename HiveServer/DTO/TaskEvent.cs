@@ -8,6 +8,11 @@ namespace HiveServer.DTO
 {
     public class TaskEvent
     {
+        public TaskEvent()
+        {
+
+        }
+
         public TaskEvent(TaskDTO job, long userId, string title = "Changes where made by")
         {
             Title = title;

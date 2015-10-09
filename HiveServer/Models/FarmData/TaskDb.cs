@@ -8,10 +8,10 @@ using System.Web;
 
 namespace HiveServer.Models
 {
-    public class JobDb : Base.Entity
+    public class TaskDb : Base.Entity
     {
 
-        public JobDb()
+        public TaskDb()
         {
             long me = DateTime.UtcNow.ToBinary(); 
 

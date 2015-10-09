@@ -7,13 +7,13 @@ namespace HiveServer.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddedEventsToJobs : IMigrationMetadata
+    public sealed partial class CHengedFieldId : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedEventsToJobs));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(CHengedFieldId));
         
         string IMigrationMetadata.Id
         {
-            get { return "201509281306553_AddedEventsToJobs"; }
+            get { return "201510091617361_CHengedFieldId"; }
         }
         
         string IMigrationMetadata.Source

@@ -19,13 +19,13 @@ namespace HiveServer.Models.FarmData
 
         public virtual OrganisationDb Org { get; set;}
 
-        public long OnOrgId { get; set; }
+        public long OrgId { get; set; }
 
-        public virtual List<JobDb> Jobs { get; set; }
+        public virtual List<TaskDb> Jobs { get; set; }
 
         public FieldDb()
         {
-            Jobs = new List<JobDb>();
+            Jobs = new List<TaskDb>();
         }
 
     }
