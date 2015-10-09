@@ -214,6 +214,7 @@ namespace HiveServer.Controllers
                 oldTask.timeSpent = newTask.timeSpent;
                 oldTask.Deleted = newTask.Deleted;
                 oldTask.assignedToId = newTask.assignedToId;
+                oldTask.UpdatedAt = DateTime.UtcNow; 
 
                 
                 eventLog.Add(new TaskEvent((DTO.TaskDTO)oldTask, UserId));
@@ -244,7 +245,7 @@ namespace HiveServer.Controllers
             string role = OrganisationsController.FindAndGetRole(oldTask.onField.Org, UserId);
             TaskManagementRole = BondDb.CanAssignJobsToOthers.Contains(role); 
 
-            if (CheckPermission(TaskManagementRole, UserId, oldTask))
+            if (! CheckPermission(TaskManagementRole, UserId, oldTask))
             {
                 oldTask.Deleted = true;
                 eventLog = JsonConvert.DeserializeObject<List<TaskEvent>>(oldTask.EventLog);
@@ -268,9 +269,9 @@ namespace HiveServer.Controllers
             bool advancedEdits = false; 
 
             if(task1 != null && task2 == null)
-            { task1 = task2; }
-            else if(task2 != null && task1 == null)
             { task2 = task1; }
+            else if(task2 != null && task1 == null)
+            { task1 = task2; }
             else if(task1 != null && task2 != null)
             { //Good!
             }

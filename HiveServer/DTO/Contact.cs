@@ -1,4 +1,5 @@
 ﻿using HiveServer.DTO;
+using HiveServer.Models;
 using HiveServer.Models.FarmData;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace HiveServer.DTO
                 yield return new ValidationResult("Version information is missing or too short");
             }
 
-            if(! BondDb.ValidStates.Contains(state))
+            if(! ContactDb.ValidStates.Contains(state))
             {
                 yield return new ValidationResult("You have not supplied a valid state");
             }
