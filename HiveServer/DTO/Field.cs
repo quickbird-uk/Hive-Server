@@ -28,7 +28,7 @@ namespace HiveServer.DTO
             {
                 fieldDescription = string.Empty;
             }
-            if (Version == null || Version.Count() < 5)
+            if ((Version == null || Version.Count() < 5) && OldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }
@@ -36,7 +36,7 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("You must provide the organisation, to which the field is attached");
             }
-            if (Id == 0)
+            if (Id == 0 && OldObject)
             {
                 yield return new ValidationResult("You must provide the id");
             }

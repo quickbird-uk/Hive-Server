@@ -90,7 +90,7 @@ namespace HiveServer.DTO
             {
                 jobDescription = string.Empty;
             }
-            if (Version == null || Version.Count() < 5)
+            if ((Version == null || Version.Count() < 5) && OldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }
@@ -98,7 +98,7 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("You must provide the field, where the job is assigned");
             }
-            if (Id == 0)
+            if (Id == 0 && OldObject)
             {
                 yield return new ValidationResult("You must provide the id");
             }

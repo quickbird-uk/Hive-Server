@@ -50,6 +50,8 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Post([FromBody] Field newField)
         {
             var userId = long.Parse(User.Identity.GetUserId());
+            if(newField != null)
+                newField.OldObject = false; 
 
             HttpResponseMessage responce = Utils.CheckModel(newField, Request);
             if (!responce.IsSuccessStatusCode)
@@ -73,7 +75,7 @@ namespace HiveServer.Controllers
 
             db.Fields.Add(newFieldDB);
             await db.SaveChangesAsync();
-            return Ok();
+            return Ok((Field) newFieldDB);
         }
 
         /// <summary>

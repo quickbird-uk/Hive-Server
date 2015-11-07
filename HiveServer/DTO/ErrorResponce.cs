@@ -40,6 +40,7 @@ namespace HiveServer.DTO
         public static readonly ErrorResponse EmailTaken = new ErrorResponse { error = 102, error_description = "user with this email already exists" };
         public static readonly ErrorResponse CantLogin = new ErrorResponse { error = 103, error_description = "Login Details are incorrect" };
         public static readonly ErrorResponse PasswordIsBad = new ErrorResponse { error = 104, error_description = "This password is not good enough or invalid" };
+        public static readonly ErrorResponse PhoneNumberUnconfirmed = new ErrorResponse { error = 105, error_description = "You must confirm your phone number, before logging in with Password. Use the SMS code we've just sent you" };
 
         //Data Errors
         public static readonly ErrorResponse CantView = new ErrorResponse { error = 201, error_description = "User is not authorised to view this data" };

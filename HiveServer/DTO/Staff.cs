@@ -37,7 +37,7 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("you must provide person ID");
             }
-            if (Version == null || Version.Count() < 5)
+            if ((Version == null || Version.Count() < 5) && OldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }

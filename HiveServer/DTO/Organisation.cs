@@ -24,7 +24,7 @@ namespace HiveServer.DTO
             {
                 orgDescription = string.Empty;
             }
-            if (Version == null || Version.Count() < 5)
+            if ((Version == null || Version.Count() < 5) && OldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }

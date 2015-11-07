@@ -50,6 +50,9 @@ namespace HiveServer.Controllers
         /// <param name="neworganisation">returns 200 if successfull, or ErrorResponce</param>
         public async Task<dynamic> Post([FromBody] Organisation neworganisation)
         {
+            if (neworganisation != null)
+                neworganisation.OldObject = false; ;
+
             HttpResponseMessage responce = Utils.CheckModel(neworganisation, Request);
             if (!responce.IsSuccessStatusCode)
                 return responce;
@@ -73,7 +76,7 @@ namespace HiveServer.Controllers
             db.Bindings.Add(bond);
 
             await db.SaveChangesAsync();
-            return Ok(); 
+            return Ok((Organisation) bond);  
         }
 
         /// <summary>

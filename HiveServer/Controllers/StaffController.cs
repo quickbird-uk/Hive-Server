@@ -52,6 +52,8 @@ namespace HiveServer.Controllers
         /// <returns></returns>
         public async Task<dynamic> Post([FromBody] Staff newStaff)
         {
+            if (newStaff != null)
+                newStaff.OldObject = false; 
 
             var UserId = long.Parse(User.Identity.GetUserId());
 
@@ -106,7 +108,7 @@ namespace HiveServer.Controllers
 
             await SMSService.SendMessage(invitee.PhoneNumber.ToString(), message);
 
-            return Ok();
+            return Ok((Staff) staffDB);
         }
 
         /// <summary> Allows the person to alter Role of staff already assigned to the organisation, manager cannot alter the Role of the organisation owner, only managers and owners can do this</summary>

@@ -72,7 +72,7 @@ namespace HiveServer.Controllers
             db.Contacts.Add(newContact);
             await db.SaveChangesAsync(); 
 
-            return Ok(); 
+            return Ok(newContact.ToContact(UserId)); 
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace HiveServer.Controllers
                 peopleDTO.Add((Base.Person)user);
             }
 
-            return Request.CreateResponse(HttpStatusCode.BadRequest, peopleDTO);
+            return Request.CreateResponse(HttpStatusCode.OK, peopleDTO);
         } 
     }
 }

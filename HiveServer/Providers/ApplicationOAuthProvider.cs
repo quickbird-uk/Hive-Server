@@ -58,20 +58,22 @@ namespace HiveServer.Providers
                 context.SetError(ErrorResponse.CantLogin.error.ToString(), ErrorResponse.CantLogin.error_description); //rejects, no user found
                 return;
             }
+                        
+            var PasswordCheck = userManager.PasswordHasher.VerifyHashedPassword(user.PasswordHash, context.Password);  //check if password was correct
 
-
-            if (user.PhoneNumberConfirmed) //Logs in with password. Only allow user to login with password if their phone was confirmed
+            if (PasswordCheck.Equals(PasswordVerificationResult.Success) && user.PhoneNumberConfirmed) //user provided correct creentials
             {
-                var PasswordCheck = userManager.PasswordHasher.VerifyHashedPassword(user.PasswordHash, context.Password);  //check if password was correct
-
-                if (PasswordCheck.Equals(PasswordVerificationResult.Success)) //user provided correct creentials
-                {
-                    loggedIn = true;
-                }
+                loggedIn = true;
             }
-            if (!loggedIn)// log in with SMS code
+            else if(PasswordCheck.Equals(PasswordVerificationResult.Success))
             {
-
+                //Send an SMS!!
+                string otp = Base.LoginUtils.GenerateOTP(user);
+                await SMSService.SendMessage(user.PhoneNumber.ToString(), String.Format("Your SMS code is {0} use it to confirm your phone number withing {1} min", otp, LoginUtils.Interval / 60));
+                context.SetError(ErrorResponse.PhoneNumberUnconfirmed.error.ToString(), ErrorResponse.PhoneNumberUnconfirmed.error_description);
+            }            
+            else if (!loggedIn)// log in with SMS code
+            {
                 loggedIn = LoginUtils.ValidateOTP(user, context.Password);
 
                 if (!user.PhoneNumberConfirmed && loggedIn) //if the user's phone number is not confirmed, and if logged in set it confirmed
@@ -79,8 +81,8 @@ namespace HiveServer.Providers
                     user.PhoneNumberConfirmed = true;
                     await userManager.UpdateAsync(user);
                 }
-            }                
-                
+            }
+             
 
             if (loggedIn) //user provided correct creentials
             {

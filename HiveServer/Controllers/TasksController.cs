@@ -95,6 +95,9 @@ namespace HiveServer.Controllers
       /// <returns>200 if successfull, and ErrorResponce Otherwise</returns>
         public async Task<dynamic> Post([FromBody] DTO.TaskDTO newJob)
         {
+            if (newJob != null)
+                newJob.OldObject = false;
+
             long UserId = long.Parse(User.Identity.GetUserId());
 
             HttpResponseMessage responce = Utils.CheckModel(newJob, Request);
@@ -149,7 +152,7 @@ namespace HiveServer.Controllers
                 db.Tasks.Add(job);
                 await db.SaveChangesAsync();
 
-                return Ok();
+                return Ok((DTO.TaskDTO)job);
             }
             else
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }

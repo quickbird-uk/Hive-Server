@@ -36,5 +36,9 @@ namespace HiveServer.Base
 
         /// <summary> marks Entity As deleted </summary>
         public bool Deleted { get; set; }
+
+        /// <summary> Setting this false makes validation not fail when a new object is created by the client,
+       ///  and  fields such as version are not set </summary>
+        public bool OldObject = true; 
     }
 }
