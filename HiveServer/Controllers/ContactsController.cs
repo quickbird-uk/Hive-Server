@@ -153,7 +153,7 @@ namespace HiveServer.Controllers
         /// </summary>
         /// <param name="search">List of people to search in teh DB</param>
         /// <returns>Return a list of people</returns>
-        [ResponseType(typeof(List<Base.Person>))]
+        [ResponseType(typeof(List<_Person>))]
         [Route("Search")]
         public async Task<dynamic> Search([FromBody]List<long> search)
         {
@@ -163,11 +163,11 @@ namespace HiveServer.Controllers
             var foundUsers =
                 await db.Users.Where(p => search.Any(s => s == p.PhoneNumber)).ToArrayAsync();
 
-            List<Base.Person> peopleDTO = new List<Base.Person>();
+            List<_Person> peopleDTO = new List<_Person>();
 
             foreach(var user in foundUsers)
             {
-                peopleDTO.Add((Base.Person)user);
+                peopleDTO.Add((_Person)user);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, peopleDTO);

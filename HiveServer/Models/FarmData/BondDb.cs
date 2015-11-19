@@ -9,7 +9,7 @@ namespace HiveServer.Models.FarmData
     /// <summary>
     /// Bidnings link people to Organisations, the type of binding dictates if it's an agicultural worker or owner of the property
     /// </summary>
-    public class BondDb : Base.Entity
+    public class BondDb : _Entity
     {
         public BondDb()
         {

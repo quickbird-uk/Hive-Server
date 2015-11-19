@@ -191,7 +191,7 @@
       <DependentUpon>201510091617361_CHengedFieldId.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="SMSService.cs" />
+    <Compile Include="Base\SMSService.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
@@ -228,7 +228,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Base\Person.cs" />
+    <Compile Include="DTO\_Person.cs" />
     <Compile Include="DTO\Account\Account.cs" />
     <Compile Include="Base\Address.cs" />
     <Compile Include="DTO\Contact.cs" />
@@ -245,8 +245,9 @@
     <Compile Include="DTO\Account\AccountBindingModels.cs" />
     <Compile Include="DTO\Account\AccountViewModels.cs" />
     <Compile Include="Models\DbContext.cs" />
-    <Compile Include="Base\Entity.cs" />
+    <Compile Include="DTO\_Entity.cs" />
     <Compile Include="Models\ContactDb.cs" />
+    <Compile Include="Models\_Entity.cs" />
     <Compile Include="Models\FarmData\BondDb.cs" />
     <Compile Include="Models\FarmData\OrganisationDb.cs" />
     <Compile Include="Models\ApplicationUser.cs" />

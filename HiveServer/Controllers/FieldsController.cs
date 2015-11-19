@@ -51,13 +51,13 @@ namespace HiveServer.Controllers
         {
             var userId = long.Parse(User.Identity.GetUserId());
             if(newField != null)
-                newField.OldObject = false; 
+                newField.oldObject = false; 
 
             HttpResponseMessage responce = Utils.CheckModel(newField, Request);
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var bond = await OrganisationsController.GetThisBondAnOrg(userId, newField.onOrg, db); 
+            var bond = await OrganisationsController.GetThisBondAnOrg(userId, newField.onOrganisationID, db); 
 
             if(bond == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist);}
@@ -67,7 +67,7 @@ namespace HiveServer.Controllers
 
             FieldDb newFieldDB = new FieldDb
             {
-                OrgId = newField.onOrg,
+                onOrganisationID = newField.onOrganisationID,
                 Org = bond.Organisation,
                 Name = newField.name,
                 FieldDescription = newField.fieldDescription
@@ -104,18 +104,18 @@ namespace HiveServer.Controllers
             if(role != BondDb.RoleManager)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
 
-            if (field.Id != newField.Id)
+            if (field.Id != newField.id)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             //for now we do not allow people ot move fields. That could change later. 
-            if (field.OrgId != newField.onOrg)
+            if (field.onOrganisationID != newField.onOrganisationID)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             field.Name = newField.name;
             field.FieldDescription = newField.fieldDescription;
-            field.Version = newField.Version;
-            field.Deleted = newField.Deleted;
-            field.UpdatedAt = DateTime.UtcNow;
+            field.Version = newField.version;
+            field.MarkedDeleted = newField.markedDeleted;
+            field.UpdatedOn = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
 
@@ -143,7 +143,7 @@ namespace HiveServer.Controllers
             if (role != BondDb.RoleManager)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
 
-            field.Deleted = true;
+            field.MarkedDeleted = true;
 
             await db.SaveChangesAsync();
 

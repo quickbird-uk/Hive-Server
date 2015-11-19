@@ -157,7 +157,7 @@ namespace HiveServer.Migrations
                         org.Fields.Add(new FieldDb
                         {
                             Name = crops[RNG.Next(11)],
-                            size = Math.Round(RNG.Next(2, 6) * fieldSize, 1)
+                            AreaInHectares = Math.Round(RNG.Next(2, 6) * fieldSize, 1)
                         }
                        );
                     }

@@ -47,7 +47,7 @@ namespace HiveServer.Models
 
 
             modelBuilder.Entity<BondDb>().ToTable("Bindings");
-            modelBuilder.Entity<BondDb>().Property(p => p.CreatedAt).IsRequired();
+            modelBuilder.Entity<BondDb>().Property(p => p.CreatedOn).IsRequired();
             modelBuilder.Entity<BondDb>().Property(p => p.Role).IsRequired();
             modelBuilder.Entity<BondDb>().Property(p => p.Role).HasMaxLength(4);
 
@@ -69,12 +69,12 @@ namespace HiveServer.Models
 
             //configure jobs
             modelBuilder.Entity<TaskDb>().ToTable("Tasks");
-            modelBuilder.Entity<TaskDb>().HasRequired(j => j.assignedBy).WithMany(p => p.JobsGiven).WillCascadeOnDelete(false);
-            modelBuilder.Entity<TaskDb>().HasRequired(j => j.assignedTo).WithMany(p => p.JobsRecieved).WillCascadeOnDelete(false);
-            modelBuilder.Entity<TaskDb>().HasRequired(j => j.onField).WithMany(f => f.Jobs).WillCascadeOnDelete(false);
-            modelBuilder.Entity<TaskDb>().Property(j => j.name).IsRequired();
-            modelBuilder.Entity<TaskDb>().Property(j => j.state).IsRequired(); // .IsFixedLength().HasMaxLength(3)
-            modelBuilder.Entity<TaskDb>().Property(j => j.type).IsRequired();
+            modelBuilder.Entity<TaskDb>().HasRequired(j => j.AssignedBy).WithMany(p => p.JobsGiven).WillCascadeOnDelete(false);
+            modelBuilder.Entity<TaskDb>().HasRequired(j => j.AssignedTo).WithMany(p => p.JobsRecieved).WillCascadeOnDelete(false);
+            modelBuilder.Entity<TaskDb>().HasRequired(j => j.ForField).WithMany(f => f.Jobs).WillCascadeOnDelete(false);
+            modelBuilder.Entity<TaskDb>().Property(j => j.Name).IsRequired();
+            modelBuilder.Entity<TaskDb>().Property(j => j.State).IsRequired(); // .IsFixedLength().HasMaxLength(3)
+            modelBuilder.Entity<TaskDb>().Property(j => j.Type).IsRequired();
             modelBuilder.Entity<TaskDb>().Property(j => j.DateFinished).HasColumnType("datetime2");
             modelBuilder.Entity<TaskDb>().Property(j => j.DueDate).HasColumnType("datetime2");
 

@@ -9,7 +9,7 @@ using System.Web;
 namespace HiveServer.DTO
 {
       
-    public class Staff: Base.Person, IValidatableObject
+    public class Staff: _Person, IValidatableObject
     {
 
         /// <summary> Id of the staff is the ID of the relationship between a person and a organisation. IF a person A is assigned to organisation X, 
@@ -18,7 +18,7 @@ namespace HiveServer.DTO
         /// 
         public long personID{ get; set; }
 
-        public long atOrgID { get; set; }
+        public long onOrganisationID { get; set; }
 
         /// <summary> Person's role at the organisation       /// </summary>
         public string role { get; set; }
@@ -29,7 +29,7 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("Provide the person's role please");
             }
-            if (atOrgID == 0)
+            if (onOrganisationID == 0)
             {
                 yield return new ValidationResult("Provide organisationID please");
             }
@@ -37,7 +37,7 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("you must provide person ID");
             }
-            if ((Version == null || Version.Count() < 5) && OldObject)
+            if ((version == null || version.Count() < 5) && oldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }
@@ -53,17 +53,17 @@ namespace HiveServer.DTO
         {
             var result = new Staff
             {
-                Id = v.Id,
+                id = v.Id,
                 personID = v.PersonID,
                 firstName = v.Person.FirstName,
                 lastName = v.Person.LastName,
                 phone = v.Person.PhoneNumber,
-                atOrgID = v.OrganisationID,
-                CreatedAt = v.CreatedAt,
-                UpdatedAt = v.UpdatedAt,
+                onOrganisationID = v.OrganisationID,
+                createdOn = v.CreatedOn,
+                updatedOn = v.UpdatedOn,
                 role = v.Role,
-                Version = v.Version,
-                Deleted = v.Deleted
+                version = v.Version,
+                markedDeleted = v.MarkedDeleted
             };
             return result;
         }

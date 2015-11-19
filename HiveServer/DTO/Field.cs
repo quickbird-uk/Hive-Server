@@ -7,17 +7,21 @@ using System.Web;
 
 namespace HiveServer.DTO
 {
-    public class Field : Base.Entity, IValidatableObject
+    public class Field : _Entity, IValidatableObject
     {
         public string name { get; set; }
 
-        public double size { get; set; }
+        public double areaInHectares { get; set; }
 
         public string fieldDescription { get; set; }
 
-        public long onOrg { get; set; }
+        public long onOrganisationID { get; set; }
 
-        
+        public double lattitude { get; set; }
+
+        public double longitude { get; set; }
+
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (string.IsNullOrEmpty(name))
@@ -28,15 +32,15 @@ namespace HiveServer.DTO
             {
                 fieldDescription = string.Empty;
             }
-            if ((Version == null || Version.Count() < 5) && OldObject)
+            if ((version == null || version.Count() < 5) && oldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }
-            if (onOrg == 0)
+            if (onOrganisationID == 0)
             {
                 yield return new ValidationResult("You must provide the organisation, to which the field is attached");
             }
-            if (Id == 0 && OldObject)
+            if (id == 0 && oldObject)
             {
                 yield return new ValidationResult("You must provide the id");
             }
@@ -48,15 +52,17 @@ namespace HiveServer.DTO
         {
             return new Field
             {
-                Id = v.Id,
-                onOrg = v.OrgId,
+                id = v.Id,
+                onOrganisationID = v.onOrganisationID,
                 name = v.Name,
-                size = v.size,
+                areaInHectares = v.AreaInHectares,
                 fieldDescription = v.FieldDescription,
-                CreatedAt = v.CreatedAt,
-                UpdatedAt = v.UpdatedAt,
-                Version = v.Version,
-                Deleted = v.Deleted               
+                createdOn = v.CreatedOn,
+                updatedOn = v.UpdatedOn,
+                version = v.Version,
+                markedDeleted = v.MarkedDeleted,
+                lattitude = v.Lattitude,
+                longitude = v.Longitude
             };
         }
 

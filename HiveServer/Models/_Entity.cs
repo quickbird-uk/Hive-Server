@@ -6,16 +6,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure.Annotations;
 using System.ComponentModel.DataAnnotations;
 
-namespace HiveServer.Base
+namespace HiveServer.Models
 {
     /// <summary> Base class for every item in the database, it spesifies common properties used by all of them </summary>
-    public class Entity
+    public class _Entity
     {
-        public Entity()
+        public _Entity()
         {
-            CreatedAt = DateTime.UtcNow;
-            UpdatedAt = DateTime.UtcNow;
-            Deleted = false; 
+            CreatedOn = DateTime.UtcNow;
+            UpdatedOn = DateTime.UtcNow;
+            MarkedDeleted = false; 
         }
 
         /// <summary> Unique identifier of this item </summary>
@@ -24,21 +24,18 @@ namespace HiveServer.Base
         public long Id { get; set; }
 
         /// <summary> Spesifies when it was created for the first time </summary>
-        public DateTimeOffset? CreatedAt { get; set; }
+        public DateTimeOffset? CreatedOn { get; set; }
 
 
         /// <summary> Spesifies when this entity was updated for the last time </summary>
-        public DateTimeOffset? UpdatedAt { get; set; }
+        public DateTimeOffset? UpdatedOn { get; set; }
 
         /// <summary> Version of the item in question, this is used for concurrency </summary>
         [Timestamp]
         public byte[] Version { get; set; }
 
         /// <summary> marks Entity As deleted </summary>
-        public bool Deleted { get; set; }
+        public bool MarkedDeleted { get; set; }
 
-        /// <summary> Setting this false makes validation not fail when a new object is created by the client,
-       ///  and  fields such as version are not set </summary>
-        public bool OldObject = true; 
     }
 }

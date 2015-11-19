@@ -16,7 +16,7 @@ using HiveServer.DTO;
 
 namespace HiveServer.Models
 {
-    public class OrganisationDb : Base.Entity
+    public class OrganisationDb : _Entity
     {
 
 

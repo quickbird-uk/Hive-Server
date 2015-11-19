@@ -64,10 +64,10 @@ namespace HiveServer.Controllers
         {
             long UserId = long.Parse(User.Identity.GetUserId());
 
-            List<IEnumerable<List<TaskDb>>> relevantJobs =  await db.Organisations.Where(f => f.Bonds.Any(b => b.PersonID == UserId) && f.Deleted == false)
-                .Select(b => b.Fields.Where(f => f.Deleted == false).Select(d => d.Jobs)).ToListAsync();
+            List<IEnumerable<List<TaskDb>>> relevantJobs =  await db.Organisations.Where(f => f.Bonds.Any(b => b.PersonID == UserId) && f.MarkedDeleted == false)
+                .Select(b => b.Fields.Where(f => f.MarkedDeleted == false).Select(d => d.Jobs)).ToListAsync();
 
-            TaskDb[] personalJobs = await db.Tasks.Where(j => j.assignedById == UserId || j.assignedToId == UserId).ToArrayAsync();
+            TaskDb[] personalJobs = await db.Tasks.Where(j => j.AssignedByID == UserId || j.AssignedToID == UserId).ToArrayAsync();
 
             List<DTO.TaskDTO> jobsDTO = new List<DTO.TaskDTO>();
 
@@ -83,7 +83,7 @@ namespace HiveServer.Controllers
             }
             foreach(TaskDb job in personalJobs)
             {
-                if(! jobsDTO.Exists(f => f.Id == job.Id))
+                if(! jobsDTO.Exists(f => f.id == job.Id))
                     jobsDTO.Add((DTO.TaskDTO)job);
             }
                  
@@ -96,7 +96,7 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Post([FromBody] DTO.TaskDTO newJob)
         {
             if (newJob != null)
-                newJob.OldObject = false;
+                newJob.oldObject = false;
 
             long UserId = long.Parse(User.Identity.GetUserId());
 
@@ -104,12 +104,12 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var theField = await db.Fields.Where(f => f.Id == newJob.onFieldId).Include(f => f.Org).Include(f => f.Org.Bonds).FirstOrDefaultAsync(); 
+            var theField = await db.Fields.Where(f => f.Id == newJob.forFieldID).Include(f => f.Org).Include(f => f.Org.Bonds).FirstOrDefaultAsync(); 
 
             if(theField == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            if(! theField.Org.Bonds.Any(p => p.PersonID == newJob.assignedToId))
+            if(! theField.Org.Bonds.Any(p => p.PersonID == newJob.assignedToID))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
             string role = OrganisationsController.FindAndGetRole(theField.Org, UserId);
@@ -121,27 +121,27 @@ namespace HiveServer.Controllers
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantView); }
 
             //Self-create
-            if (newJob.assignedToId == UserId || editRights)
+            if (newJob.assignedToID == UserId || editRights)
             { requestAuthorised = true; }
 
             TaskDb job = new TaskDb
             {
-                name = newJob.name,
-                jobDescription = newJob.jobDescription,
-                rate = newJob.rate,
-                state = newJob.state,
-                type = newJob.type,
-                DueDate = newJob.DueDate,
+                Name = newJob.name,
+                TaskDescription = newJob.taskDescription,
+                PayRate = newJob.payRate,
+                State = newJob.state,
+                Type = newJob.type,
+                DueDate = newJob.dueDate,
                 EventLog = string.Empty,
 
-                assignedById = UserId,
-                assignedToId = newJob.assignedToId,
-                onFieldId = theField.Id,
+                AssignedByID = UserId,
+                AssignedToID = newJob.assignedToID,
+                ForFieldID = theField.Id,
 
-                timeSpent = TimeSpan.Zero,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                Deleted = false
+                TimeTaken = 0,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow,
+                MarkedDeleted = false
             };
 
             eventLog.Add(new TaskEvent((DTO.TaskDTO)job, UserId, "Job crated"));
@@ -174,24 +174,24 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            TaskDb oldTask = await db.Tasks.Where(f => f.Id == id).Include(f => f.onField)
-                .Include(f => f.onField.Org).Include(f => f.onField.Org.Bonds).FirstOrDefaultAsync();
+            TaskDb oldTask = await db.Tasks.Where(f => f.Id == id).Include(f => f.ForField)
+                .Include(f => f.ForField.Org).Include(f => f.ForField.Org.Bonds).FirstOrDefaultAsync();
 
             if (oldTask == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            if (! oldTask.onField.Org.Bonds.Any(p => p.PersonID == newTask.assignedToId))
+            if (! oldTask.ForField.Org.Bonds.Any(p => p.PersonID == newTask.assignedToID))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
             //Setup variables
-            string role = OrganisationsController.FindAndGetRole(oldTask.onField.Org, UserId);
+            string role = OrganisationsController.FindAndGetRole(oldTask.ForField.Org, UserId);
             TaskManagementRole = BondDb.CanAssignJobsToOthers.Contains(role);
 
 
-            TimeAdded = oldTask.timeSpent < newTask.timeSpent;
+            TimeAdded = oldTask.TimeTaken < newTask.timeTaken;
 
 
-            anythingChanged = AdvancedEdits || TimeAdded || newTask.state != oldTask.state; 
+            anythingChanged = AdvancedEdits || TimeAdded || newTask.state != oldTask.State; 
 
             
             //Check user's access
@@ -209,15 +209,15 @@ namespace HiveServer.Controllers
             {
                 eventLog = JsonConvert.DeserializeObject<List<TaskEvent>>(oldTask.EventLog);
 
-                oldTask.name = newTask.name;
-                oldTask.jobDescription = newTask.jobDescription;
-                oldTask.rate = newTask.rate;
-                oldTask.state = newTask.state;
-                oldTask.DueDate = newTask.DueDate;
-                oldTask.timeSpent = newTask.timeSpent;
-                oldTask.Deleted = newTask.Deleted;
-                oldTask.assignedToId = newTask.assignedToId;
-                oldTask.UpdatedAt = DateTime.UtcNow; 
+                oldTask.Name = newTask.name;
+                oldTask.TaskDescription = newTask.taskDescription;
+                oldTask.PayRate = newTask.payRate;
+                oldTask.State = newTask.state;
+                oldTask.DueDate = newTask.dueDate;
+                oldTask.TimeTaken = newTask.timeTaken;
+                oldTask.MarkedDeleted = newTask.markedDeleted;
+                oldTask.AssignedToID = newTask.assignedToID;
+                oldTask.UpdatedOn = DateTime.UtcNow; 
 
                 
                 eventLog.Add(new TaskEvent((DTO.TaskDTO)oldTask, UserId));
@@ -238,19 +238,19 @@ namespace HiveServer.Controllers
         {
             long UserId = long.Parse(User.Identity.GetUserId());
 
-            var oldTask = await db.Tasks.Where(f => f.Id == id).Include(f => f.onField)
-                .Include(f => f.onField.Org).Include(f => f.onField.Org.Bonds).FirstOrDefaultAsync();
+            var oldTask = await db.Tasks.Where(f => f.Id == id).Include(f => f.ForField)
+                .Include(f => f.ForField.Org).Include(f => f.ForField.Org.Bonds).FirstOrDefaultAsync();
 
             if (oldTask == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
             //Setup variables
-            string role = OrganisationsController.FindAndGetRole(oldTask.onField.Org, UserId);
+            string role = OrganisationsController.FindAndGetRole(oldTask.ForField.Org, UserId);
             TaskManagementRole = BondDb.CanAssignJobsToOthers.Contains(role); 
 
             if (! CheckPermission(TaskManagementRole, UserId, oldTask))
             {
-                oldTask.Deleted = true;
+                oldTask.MarkedDeleted = true;
                 eventLog = JsonConvert.DeserializeObject<List<TaskEvent>>(oldTask.EventLog);
                 var it = new TaskEvent((DTO.TaskDTO)oldTask, UserId, "Task was deleted");
                 eventLog.Add(it);
@@ -284,11 +284,11 @@ namespace HiveServer.Controllers
             }
 
             //You have to check if the new and old job are both self-assigned. Otherwise the user will have admin right over the job abd be able to assign it to someone else
-            assignedToSelf = task1.assignedToId == UserId && task2.assignedToId == UserId;
-            assignedBySelf = task1.assignedById == UserId && task2.assignedById == UserId;
+            assignedToSelf = task1.assignedToID == UserId && task2.assignedToID == UserId;
+            assignedBySelf = task1.assignedByID == UserId && task2.assignedByID == UserId;
 
-            advancedEdits = (task1.rate - task2.rate) > 0.01 || task1.DueDate != task2.DueDate || task1.assignedToId != task2.assignedToId
-            || task1.type != task2.type || task1.name != task2.name || task1.jobDescription != task2.jobDescription || task1.Deleted != task2.Deleted;
+            advancedEdits = (task1.payRate - task2.payRate) > 0.01 || task1.dueDate != task2.dueDate || task1.assignedToID != task2.assignedToID
+            || task1.type != task2.type || task1.name != task2.name || task1.taskDescription != task2.taskDescription || task1.markedDeleted != task2.markedDeleted;
 
             bool[] permission = Permissions.First(p => p[0] == taskManagementRole && p[1] == assignedToSelf && p[2] == assignedBySelf);
 

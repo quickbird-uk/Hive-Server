@@ -7,11 +7,11 @@ using HiveServer.Models.FarmData;
 
 namespace HiveServer.Models.FarmData
 {
-    public class FieldDb : Base.Entity
+    public class FieldDb : _Entity
     {
         public string Name { get; set; }
 
-        public double size { get; set; }
+        public double AreaInHectares { get; set; }
 
         public string FieldDescription { get; set; }
 
@@ -19,9 +19,13 @@ namespace HiveServer.Models.FarmData
 
         public virtual OrganisationDb Org { get; set;}
 
-        public long OrgId { get; set; }
+        public long onOrganisationID { get; set; }
 
         public virtual List<TaskDb> Jobs { get; set; }
+
+        public double Lattitude { get; set; }
+
+        public double Longitude { get; set; }
 
         public FieldDb()
         {

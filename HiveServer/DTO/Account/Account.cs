@@ -8,8 +8,8 @@ namespace HiveServer.DTO
 {
 
     /// <summary> This is the calss that stores information displayed to the user about their own account  /// </summary>
-    public class Account : Base.Person
+    public class Account : _Person
     {
-
+ 
     }
 }

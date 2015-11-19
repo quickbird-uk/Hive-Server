@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HiveServer.DTO
 {
-    public class Organisation: Base.Entity ,  IValidatableObject
+    public class Organisation: _Entity ,  IValidatableObject
     {
         public string name { get; set; }
 
@@ -24,7 +24,7 @@ namespace HiveServer.DTO
             {
                 orgDescription = string.Empty;
             }
-            if ((Version == null || Version.Count() < 5) && OldObject)
+            if ((version == null || version.Count() < 5) && oldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }
@@ -34,14 +34,14 @@ namespace HiveServer.DTO
         {
             var result = new Organisation
             {
-                Id = v.Organisation.Id,
+                id = v.Organisation.Id,
                 name = v.Organisation.Name,
                 orgDescription = v.Organisation.Description,
-                CreatedAt = v.Organisation.CreatedAt,
-                UpdatedAt = v.Organisation.UpdatedAt,
+                createdOn = v.Organisation.CreatedOn,
+                updatedOn = v.Organisation.UpdatedOn,
                 role = v.Role,
-                Version = v.Version,
-                Deleted = v.Organisation.Deleted
+                version = v.Version,
+                markedDeleted = v.Organisation.MarkedDeleted
             };
             return result;
         }

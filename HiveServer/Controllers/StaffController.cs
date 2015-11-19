@@ -53,7 +53,7 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Post([FromBody] Staff newStaff)
         {
             if (newStaff != null)
-                newStaff.OldObject = false; 
+                newStaff.oldObject = false; 
 
             var UserId = long.Parse(User.Identity.GetUserId());
 
@@ -70,7 +70,7 @@ namespace HiveServer.Controllers
             if(contacts.State != ContactDb.StateFriend)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
-            var bindingsList = await db.Bindings.Where(b => b.OrganisationID == newStaff.atOrgID).Include(b => b.Organisation).ToArrayAsync();   
+            var bindingsList = await db.Bindings.Where(b => b.OrganisationID == newStaff.onOrganisationID).Include(b => b.Organisation).ToArrayAsync();   
 
             if (bindingsList.Count() == 0) //does the spesified organisation exist
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
@@ -89,7 +89,7 @@ namespace HiveServer.Controllers
 
             BondDb staffDB = new BondDb
             {
-                OrganisationID = newStaff.atOrgID,
+                OrganisationID = newStaff.onOrganisationID,
                 PersonID = newStaff.personID,
                 Role = newStaff.role
             };
@@ -102,7 +102,7 @@ namespace HiveServer.Controllers
             string inviterName = inviter.FirstName + " " + inviter.LastName;
             var invitee = await db.Users.FirstOrDefaultAsync(i => i.Id == staffDB.PersonID);
 
-            var organisation = await db.Organisations.FirstOrDefaultAsync(f => f.Id == newStaff.atOrgID);
+            var organisation = await db.Organisations.FirstOrDefaultAsync(f => f.Id == newStaff.onOrganisationID);
             string organisationName = organisation.Name;
             string message = String.Format("You have been assigned as {0} on {1} by {2}. Congratulations! If {2} gives you unwanted assignment, you may remove {2} from your contacts ", staffDB.Role, organisationName, inviterName);
 
@@ -123,7 +123,7 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var bindingsList = await db.Bindings.Where(b => b.OrganisationID == changedStaff.atOrgID).Include(b => b.Organisation).ToArrayAsync();
+            var bindingsList = await db.Bindings.Where(b => b.OrganisationID == changedStaff.onOrganisationID).Include(b => b.Organisation).ToArrayAsync();
             var selectedBond = bindingsList?.FirstOrDefault(b => b.Id == id);
 
             if (selectedBond == null) //does the spesified organisation exist
@@ -143,8 +143,8 @@ namespace HiveServer.Controllers
             if(selectedBond.PersonID == UserId)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
-            selectedBond.UpdatedAt = DateTime.UtcNow;
-            selectedBond.Version = changedStaff.Version;
+            selectedBond.UpdatedOn = DateTime.UtcNow;
+            selectedBond.Version = changedStaff.version;
             selectedBond.Role = changedStaff.role;
 
             await db.SaveChangesAsync();

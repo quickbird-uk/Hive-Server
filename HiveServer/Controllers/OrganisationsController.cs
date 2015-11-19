@@ -51,7 +51,7 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Post([FromBody] Organisation neworganisation)
         {
             if (neworganisation != null)
-                neworganisation.OldObject = false; ;
+                neworganisation.oldObject = false; ;
 
             HttpResponseMessage responce = Utils.CheckModel(neworganisation, Request);
             if (!responce.IsSuccessStatusCode)
@@ -104,9 +104,9 @@ namespace HiveServer.Controllers
             var orgDb = orgBonds.Organisation; 
             orgDb.Name = newOrganisation.name;
             orgDb.Description = newOrganisation.orgDescription;
-            orgDb.Version = newOrganisation.Version;
-            orgDb.UpdatedAt = DateTime.UtcNow;
-            orgDb.Deleted = newOrganisation.Deleted;
+            orgDb.Version = newOrganisation.version;
+            orgDb.UpdatedOn = DateTime.UtcNow;
+            orgDb.MarkedDeleted = newOrganisation.markedDeleted;
             
 
             await db.SaveChangesAsync();
@@ -132,7 +132,7 @@ namespace HiveServer.Controllers
             if (OrgBonds.Role != Models.FarmData.BondDb.RoleOwner)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
 
-            OrgBonds.Organisation.Deleted = true;  
+            OrgBonds.Organisation.MarkedDeleted = true;  
             await db.SaveChangesAsync();
             return Ok();
         }

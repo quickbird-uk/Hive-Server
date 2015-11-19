@@ -19,12 +19,12 @@ namespace HiveServer.DTO
             Timestamp = DateTime.UtcNow;
             ChangedBy = userId;
 
-            Rate = job.rate;
-            AssignedTo = job.assignedToId;
+            Rate = job.payRate;
+            AssignedTo = job.assignedToID;
             Type = job.type;
             Name = job.name;
-            JobDescription = job.jobDescription;
-            Deleted = job.Deleted;
+            JobDescription = job.taskDescription;
+            Deleted = job.markedDeleted;
         }
 
         public string Title { get; set; }

@@ -6,43 +6,45 @@ using System.Linq;
 using System.Web;
 
 
+
+
 namespace HiveServer.Models
 {
-    public class TaskDb : Base.Entity
+
+
+    public class TaskDb : _Entity
     {
 
         public TaskDb()
         {
-            long me = DateTime.UtcNow.ToBinary(); 
-
 
         }
 
-        public string name { get; set; }
-        public string jobDescription { get; set; }
+        public string Name { get; set; }
+        public string TaskDescription { get; set; }
 
-        public string type { get; set; }
+        public string Type { get; set; }
 
-        public virtual FieldDb  onField { get; set; }
-        public virtual long onFieldId { get; set; }
+        public virtual FieldDb  ForField { get; set; }
+        public virtual long ForFieldID { get; set; }
 
-        public virtual ApplicationUser assignedBy { get; set; }
-        public virtual long assignedById { get; set; }
+        public virtual ApplicationUser AssignedBy { get; set; }
+        public virtual long AssignedByID { get; set; }
 
-        public virtual ApplicationUser assignedTo { get; set; }
-        public virtual long assignedToId { get; set; }
+        public virtual ApplicationUser AssignedTo { get; set; }
+        public virtual long AssignedToID { get; set; }
 
         public DateTime DueDate { get; set; }
 
         public DateTime DateFinished { get; set; }
 
-        public string state { get; set; }
+        public string State { get; set; }
 
         public string EventLog { get; set; }
 
-        public double rate { get; set; }
+        public double PayRate { get; set; }
 
-        public TimeSpan timeSpent { get; set; }
+        public uint TimeTaken { get; set; }
 
         public static string StatePending = "Pen";
         public static string StateAssigned = "Ass";

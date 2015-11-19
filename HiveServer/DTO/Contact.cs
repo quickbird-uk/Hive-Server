@@ -8,9 +8,9 @@ using System.Linq;
 namespace HiveServer.DTO
 {
       
-    public class Contact: Base.Person, IValidatableObject
+    public class Contact: _Person, IValidatableObject
     {
-        public long personID { get; set; }
+        public long friendID { get; set; }
         //State of the contact, such as active, blocked, ets. 
         public string state { get; set; }
 
@@ -19,20 +19,19 @@ namespace HiveServer.DTO
             if (string.IsNullOrEmpty(state))
             {
                 yield return new ValidationResult("Provide state for the contact");
-            }
-            
+            }            
 
-            if (Id == 0)
+            if (id == 0)
             {
                 yield return new ValidationResult("Pleave provide ID for the Contact entity");
             }
 
-            if (personID == 0)
+            if (friendID == 0)
             {
                 yield return new ValidationResult("Pleave provide ID for the relevant person");
             }
 
-            if (Version == null || Version.Count() < 5)
+            if (version == null || version.Count() < 5)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }

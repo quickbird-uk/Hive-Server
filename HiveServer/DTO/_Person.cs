@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace HiveServer.Base
+namespace HiveServer.DTO
 {
-    public class Person : Entity
+    public class _Person : _Entity
     {
 
         public string firstName { get; set; }
@@ -16,11 +16,11 @@ namespace HiveServer.Base
         public long phone { get; set; }
 
 
-        public static explicit operator Person(ApplicationUser v)
+        public static explicit operator _Person(ApplicationUser v)
         {
-            return new Person
+            return new _Person
             {
-                Id = v.Id,
+                id = v.Id,
                 firstName = v.FirstName,
                 lastName = v.LastName,
                 phone = v.PhoneNumber,

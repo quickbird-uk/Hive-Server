@@ -13,7 +13,7 @@ namespace HiveServer.Models
     /// <summary>
     /// Records form a contact book. Friendship book is a list of people each user knows on the system. 
     /// </summary>
-    public class ContactDb : Base.Entity
+    public class ContactDb : _Entity
     {
         [Index("ForIndex", Order = 1)]
         [Index("RevIndex", Order = 2)]
@@ -56,11 +56,11 @@ namespace HiveServer.Models
         {
             var friendDto = new Contact
             {
-                CreatedAt = CreatedAt,
-                UpdatedAt = UpdatedAt,
-                Id = Id,
-                Deleted = Deleted,
-                Version = Version
+                createdOn = CreatedOn,
+                updatedOn = UpdatedOn,
+                id = Id,
+                markedDeleted = MarkedDeleted,
+                version = Version
             };
 
             //determine which of the two users are we creating the DTO for
@@ -69,7 +69,7 @@ namespace HiveServer.Models
                 friendDto.firstName = Person2.FirstName;
                 friendDto.lastName = Person2.LastName;
                 friendDto.phone = Person2.PhoneNumber;
-                friendDto.personID = Person2Id;
+                friendDto.friendID = Person2Id;
                 friendDto.state = State;
             }
             else if (Person2Id == userId)
@@ -77,7 +77,7 @@ namespace HiveServer.Models
                 friendDto.firstName = Person1.FirstName;
                 friendDto.lastName = Person1.LastName;
                 friendDto.phone = Person1.PhoneNumber;
-                friendDto.personID = Person1Id;
+                friendDto.friendID = Person1Id;
 
                 //Flip around pending expression  
                 friendDto.state = FlipState(State);

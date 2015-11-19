@@ -8,35 +8,36 @@ using System.Web;
 
 namespace HiveServer.DTO
 {
-    public class TaskDTO : Base.Entity, IValidatableObject
+    public class TaskDTO : _Entity, IValidatableObject
     {
         public string name { get; set; }
-        public string jobDescription { get; set; }
+        public string taskDescription { get; set; }
 
         public string type { get; set; }
 
-        public virtual long onFieldId { get; set; }
+        public virtual long forFieldID { get; set; }
 
-        public virtual long assignedById { get; set; }
+        public virtual long assignedByID { get; set; }
 
-        public virtual long assignedToId { get; set; }
+        public virtual long assignedToID { get; set; }
 
-        public DateTime DateFinished { get; set; }
+        public DateTime completedOnDate { get; set; }
 
-        public DateTime DueDate { get; set; }
+        public DateTime dueDate { get; set; }
 
-        public virtual List<TaskEvent> Events { get; set; }
+        public virtual List<TaskEvent> eventLog { get; set; }
 
         public string state { get; set; }
 
-        public double rate { get; set; }
+        public double payRate { get; set; }
 
-        public TimeSpan timeSpent { get; set; }
+        /// <summary> Time taken for the job in Seconds </summary>
+        public uint timeTaken { get; set; }
 
 
         public TaskDTO ()
         {
-            Events = new List<TaskEvent>();
+            eventLog = new List<TaskEvent>();
             
         }
 
@@ -44,28 +45,28 @@ namespace HiveServer.DTO
         {
             TaskDTO dto =  new TaskDTO
             {
-                Id = v.Id,
-                name = v.name,
-                jobDescription = v.jobDescription,
+                id = v.Id,
+                name = v.Name,
+                taskDescription = v.TaskDescription,
 
-                state = v.state,
-                rate = v.rate,
-                type = v.type,
-                DueDate = v.DueDate, 
-                assignedById = v.assignedById,
-                assignedToId = v.assignedToId,
-                timeSpent = v.timeSpent,
-                DateFinished = v.DateFinished,
+                state = v.State,
+                payRate = v.PayRate,
+                type = v.Type,
+                dueDate = v.DueDate, 
+                assignedByID = v.AssignedByID,
+                assignedToID = v.AssignedToID,
+                timeTaken = v.TimeTaken,
+                completedOnDate = v.DateFinished,
 
-                onFieldId = v.onFieldId,
-                CreatedAt = v.CreatedAt,
-                UpdatedAt = v.UpdatedAt,
-                Version = v.Version,
-                Deleted = v.Deleted
+                forFieldID = v.ForFieldID,
+                createdOn = v.CreatedOn,
+                updatedOn = v.UpdatedOn,
+                version = v.Version,
+                markedDeleted = v.MarkedDeleted
             };
 
 
-            dto.Events = JsonConvert.DeserializeObject<List<TaskEvent>>(v.EventLog) ?? null;
+            dto.eventLog = JsonConvert.DeserializeObject<List<TaskEvent>>(v.EventLog) ?? null;
             
 
             return dto; 
@@ -86,27 +87,27 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("You have to spesify the Job type");
             }
-            if (string.IsNullOrEmpty(jobDescription))
+            if (string.IsNullOrEmpty(taskDescription))
             {
-                jobDescription = string.Empty;
+                taskDescription = string.Empty;
             }
-            if ((Version == null || Version.Count() < 5) && OldObject)
+            if ((version == null || version.Count() < 5) && oldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
             }
-            if (onFieldId == 0)
+            if (forFieldID == 0)
             {
                 yield return new ValidationResult("You must provide the field, where the job is assigned");
             }
-            if (Id == 0 && OldObject)
+            if (id == 0 && oldObject)
             {
                 yield return new ValidationResult("You must provide the id");
             }
-            if (assignedById == 0)
+            if (assignedByID == 0)
             {
                 yield return new ValidationResult("You must provide ID of the assigner");
             }
-            if (assignedToId == 0)
+            if (assignedToID == 0)
             {
                 yield return new ValidationResult("You must provide ID of the assignee");
             }
@@ -114,7 +115,7 @@ namespace HiveServer.DTO
             {
                 yield return new ValidationResult("You did not provide a valid state");
             }
-            if (timeSpent == null || timeSpent > new TimeSpan(2,0,0,0,0))
+            if (timeTaken == null || timeTaken > 31000000)
             {
                 yield return new ValidationResult("You must spesify time spent and it must be sane");
             }
