@@ -17,6 +17,8 @@ namespace HiveServer.DTO
 
         public long onOrganisationID { get; set; }
 
+        public string parcelNumber { get; set; }
+
         public double lattitude { get; set; }
 
         public double longitude { get; set; }
@@ -35,6 +37,10 @@ namespace HiveServer.DTO
             if ((version == null || version.Count() < 5) && oldObject)
             {
                 yield return new ValidationResult("Version information is missing or too short");
+            }
+            if (parcelNumber == null)
+            {
+                parcelNumber = string.Empty;
             }
             if (onOrganisationID == 0)
             {
@@ -62,7 +68,8 @@ namespace HiveServer.DTO
                 version = v.Version,
                 markedDeleted = v.MarkedDeleted,
                 lattitude = v.Lattitude,
-                longitude = v.Longitude
+                longitude = v.Longitude,
+                parcelNumber = v.ParcelNumber
             };
         }
 
