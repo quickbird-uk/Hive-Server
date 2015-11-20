@@ -104,15 +104,15 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var theField = await db.Fields.Where(f => f.Id == newJob.forFieldID).Include(f => f.Org).Include(f => f.Org.Bonds).FirstOrDefaultAsync(); 
+            var theField = await db.Fields.Where(f => f.Id == newJob.forFieldID).Include(f => f.OnOrganisation).Include(f => f.OnOrganisation.Bonds).FirstOrDefaultAsync(); 
 
             if(theField == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            if(! theField.Org.Bonds.Any(p => p.PersonID == newJob.assignedToID))
+            if(! theField.OnOrganisation.Bonds.Any(p => p.PersonID == newJob.assignedToID))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
-            string role = OrganisationsController.FindAndGetRole(theField.Org, UserId);
+            string role = OrganisationsController.FindAndGetRole(theField.OnOrganisation, UserId);
             bool editRights = BondDb.CanAssignJobsToOthers.Contains(role);
             bool requestAuthorised = false; 
 
@@ -175,16 +175,16 @@ namespace HiveServer.Controllers
                 return responce;
 
             TaskDb oldTask = await db.Tasks.Where(f => f.Id == id).Include(f => f.ForField)
-                .Include(f => f.ForField.Org).Include(f => f.ForField.Org.Bonds).FirstOrDefaultAsync();
+                .Include(f => f.ForField.OnOrganisation).Include(f => f.ForField.OnOrganisation.Bonds).FirstOrDefaultAsync();
 
             if (oldTask == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            if (! oldTask.ForField.Org.Bonds.Any(p => p.PersonID == newTask.assignedToID))
+            if (! oldTask.ForField.OnOrganisation.Bonds.Any(p => p.PersonID == newTask.assignedToID))
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.PersonNotAvaliable); }
 
             //Setup variables
-            string role = OrganisationsController.FindAndGetRole(oldTask.ForField.Org, UserId);
+            string role = OrganisationsController.FindAndGetRole(oldTask.ForField.OnOrganisation, UserId);
             TaskManagementRole = BondDb.CanAssignJobsToOthers.Contains(role);
 
 
@@ -239,13 +239,13 @@ namespace HiveServer.Controllers
             long UserId = long.Parse(User.Identity.GetUserId());
 
             var oldTask = await db.Tasks.Where(f => f.Id == id).Include(f => f.ForField)
-                .Include(f => f.ForField.Org).Include(f => f.ForField.Org.Bonds).FirstOrDefaultAsync();
+                .Include(f => f.ForField.OnOrganisation).Include(f => f.ForField.OnOrganisation.Bonds).FirstOrDefaultAsync();
 
             if (oldTask == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
             //Setup variables
-            string role = OrganisationsController.FindAndGetRole(oldTask.ForField.Org, UserId);
+            string role = OrganisationsController.FindAndGetRole(oldTask.ForField.OnOrganisation, UserId);
             TaskManagementRole = BondDb.CanAssignJobsToOthers.Contains(role); 
 
             if (! CheckPermission(TaskManagementRole, UserId, oldTask))

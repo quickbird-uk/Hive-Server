@@ -11,30 +11,7 @@ using System.Web;
 namespace HiveServer.Models
 {
 
- 
-    public enum TaskState 
-    {
-        Pending = "Pending",
-        Assigned = "Assigned",
-        InProgress = "In Progress",
-        Paused = "Paused",
-        Finished = "Finished"
 
-        // Might be tempting to use attributes instead of 
-        // specifying a base type for the Enum but it's poor
-        // design. something like this
-        //
-        // enum TaskState {
-        //	[StringValue("Pending")]
-        //	Pending = 1,
-        //  [StringValue("Assigned")]
-        //  Assigned = 2,
-        //  .
-        //  .
-        //  .
-        //  This is very slow because it uses reflection to read the 
-        //  attribute value. 
-    };
 
     public class TaskDb : _Entity
     {

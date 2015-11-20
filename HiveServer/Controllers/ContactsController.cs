@@ -66,11 +66,17 @@ namespace HiveServer.Controllers
             {
                 State = ContactDb.StatePendingP2,
                 Person1Id = UserId,
-                Person2Id =contactID
+                Person2Id = contactID
             };
 
             db.Contacts.Add(newContact);
-            await db.SaveChangesAsync(); 
+            await db.SaveChangesAsync();
+
+            var parties = await db.Users.Where(p => p.Id == contactID || p.Id == UserId).ToArrayAsync();
+            long phone = parties.First(p => p.Id == contactID).PhoneNumber; 
+            string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
+            string message = "QHive: " + String.Format("{0} has sent you a friend request!", actorName);
+            SMSService.SendMessage(phone.ToString(), message); //We don;t want to await an SMS, really 
 
             return Ok(newContact.ToContact(UserId)); 
         }
@@ -85,6 +91,7 @@ namespace HiveServer.Controllers
         public async Task<dynamic> Put([FromUri] long id, [FromBody]Contact contactWeb)
         {
             var UserId = long.Parse(User.Identity.GetUserId());
+            string message = string.Empty; 
 
             HttpResponseMessage responce = Utils.CheckModel(contactWeb, Request);
             if (!responce.IsSuccessStatusCode)
@@ -101,7 +108,9 @@ namespace HiveServer.Controllers
 
             //when you can become friends
             if (contact.state == ContactDb.StatePendingP1 && contactWeb.state == ContactDb.StateFriend)
-            { contactDb.State = ContactDb.StateFriend; }
+            { contactDb.State = ContactDb.StateFriend;
+                message = "has accepted your friend request!";
+            }
 
             //when you can block the person
             else if (contact.state == ContactDb.StateFriend && contactWeb.state == ContactDb.StateBlockedP2
@@ -111,12 +120,19 @@ namespace HiveServer.Controllers
                 { contactDb.State = ContactDb.StateBlockedP2; }
                 else
                 { contactDb.State = ContactDb.StateBlockedP1; }
+                message = "has blocked you!";
             }
-
             else 
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             await db.SaveChangesAsync();
+
+            var parties = await db.Users.Where(p => p.Id == id || p.Id == UserId).ToArrayAsync();
+            long phone = parties.First(p => p.Id == id).PhoneNumber;
+            string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
+            string SmsMesage = "QHive: " + actorName + " " + message;
+            SMSService.SendMessage(phone.ToString(), SmsMesage); //We don;t want to await an SMS, really 
+
             return Ok();
         }
 
@@ -145,6 +161,13 @@ namespace HiveServer.Controllers
 
             db.Contacts.Remove(contactDb);
             await db.SaveChangesAsync();
+
+            var parties = await db.Users.Where(p => p.Id == id || p.Id == UserId).ToArrayAsync();
+            long phone = parties.First(p => p.Id == id).PhoneNumber;
+            string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
+            string SmsMesage = "QHive: " + actorName + " has deleted you!";
+            SMSService.SendMessage(phone.ToString(), SmsMesage); //We don;t want to await an SMS, really 
+
             return Ok(); 
         }
 

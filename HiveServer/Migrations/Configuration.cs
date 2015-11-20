@@ -48,9 +48,9 @@ namespace HiveServer.Migrations
 
             users.Add(new ApplicationUser
             {
-                FirstName = "Animesh",
-                LastName = "Mishra",
-                PhoneNumber = 7796604116,
+                FirstName = "Some",
+                LastName = "Asshole",
+                PhoneNumber = 999999999,
 
             });
 
@@ -75,7 +75,7 @@ namespace HiveServer.Migrations
             {
                 FirstName = "Manuel",
                 LastName = "Sanabria",
-                PhoneNumber = 745272505,
+                PhoneNumber = 7796604116,
                 Email = "manuel@quickbird.uk",
 
             });
@@ -92,7 +92,9 @@ namespace HiveServer.Migrations
                     var bond = new BondDb
                     {
                         Role = BondDb.RoleOwner,
-                        Organisation = org
+                        Organisation = org,
+                        CreatedOn = DateTime.UtcNow,
+                        UpdatedOn = DateTime.UtcNow
                     };
 
                     context.Organisations.Add(org);
@@ -109,7 +111,9 @@ namespace HiveServer.Migrations
                         users[2].Bound.Add(new BondDb
                         {
                             Organisation = user.Bound[0].Organisation,
-                            Role = BondDb.RoleSpecialist
+                            Role = BondDb.RoleSpecialist,
+                            CreatedOn = DateTime.UtcNow,
+                            UpdatedOn = DateTime.UtcNow
                         });
                     }
                 }
@@ -119,22 +123,30 @@ namespace HiveServer.Migrations
                     users[0].Bound.Add(new BondDb
                     {
                         Organisation = users[4].Bound[0].Organisation,
-                        Role = BondDb.RoleCrew
+                        Role = BondDb.RoleCrew,
+                        CreatedOn = DateTime.UtcNow,
+                        UpdatedOn = DateTime.UtcNow
                     });
                     users[1].Bound.Add(new BondDb
                     {
                         Organisation = users[4].Bound[0].Organisation,
-                        Role = BondDb.RoleCrew
+                        Role = BondDb.RoleCrew,
+                        CreatedOn = DateTime.UtcNow,
+                        UpdatedOn = DateTime.UtcNow
                     });
                     users[5].Bound.Add(new BondDb
                     {
                         Organisation = users[4].Bound[0].Organisation,
-                        Role = BondDb.RoleCrew
+                        Role = BondDb.RoleCrew,
+                        CreatedOn = DateTime.UtcNow,
+                        UpdatedOn = DateTime.UtcNow
                     });
                     users[3].Bound.Add(new BondDb
                     {
                         Organisation = users[4].Bound[0].Organisation,
-                        Role = BondDb.RoleCrew
+                        Role = BondDb.RoleCrew,
+                        CreatedOn = DateTime.UtcNow,
+                        UpdatedOn = DateTime.UtcNow
                     });
                 }
 
@@ -157,7 +169,9 @@ namespace HiveServer.Migrations
                         org.Fields.Add(new FieldDb
                         {
                             Name = crops[RNG.Next(11)],
-                            AreaInHectares = Math.Round(RNG.Next(2, 6) * fieldSize, 1)
+                            AreaInHectares = Math.Round(RNG.Next(2, 6) * fieldSize, 1),
+                            ParcelNumber = string.Empty,
+                            FieldDescription = string.Empty
                         }
                        );
                     }
@@ -202,7 +216,9 @@ namespace HiveServer.Migrations
                             Person1 = user,
                             Person2 = users[contactId],
                             Person2Id = users[contactId].Id,
-                            State = ContactDb.StateFriend
+                            State = ContactDb.StateFriend,
+                            CreatedOn = DateTime.UtcNow,
+                            UpdatedOn = DateTime.UtcNow
                         });
                     }
 

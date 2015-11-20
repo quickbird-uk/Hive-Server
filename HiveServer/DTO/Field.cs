@@ -19,7 +19,7 @@ namespace HiveServer.DTO
 
         public string parcelNumber { get; set; }
 
-        public double lattitude { get; set; }
+        public double latitude { get; set; }
 
         public double longitude { get; set; }
 
@@ -67,7 +67,7 @@ namespace HiveServer.DTO
                 updatedOn = v.UpdatedOn,
                 version = v.Version,
                 markedDeleted = v.MarkedDeleted,
-                lattitude = v.Lattitude,
+                latitude = v.Lattitude,
                 longitude = v.Longitude,
                 parcelNumber = v.ParcelNumber
             };

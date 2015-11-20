@@ -68,10 +68,10 @@ namespace HiveServer.Controllers
             FieldDb newFieldDB = new FieldDb
             {
                 onOrganisationID = newField.onOrganisationID,
-                Org = bond.Organisation,
+                OnOrganisation = bond.Organisation,
                 Name = newField.name,
                 FieldDescription = newField.fieldDescription,
-                Lattitude = newField.lattitude,
+                Lattitude = newField.latitude,
                 Longitude = newField.longitude,
                 ParcelNumber = newField.parcelNumber
             };
@@ -95,8 +95,8 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var field = await db.Fields.Where(f => f.Id == id).Include(f => f.Org).Include(f => f.Org.Bonds).FirstOrDefaultAsync();
-            var organisation = field?.Org;
+            var field = await db.Fields.Where(f => f.Id == id).Include(f => f.OnOrganisation).Include(f => f.OnOrganisation.Bonds).FirstOrDefaultAsync();
+            var organisation = field?.OnOrganisation;
             var staff = organisation?.Bonds;
 
             if(field == null)
@@ -120,7 +120,7 @@ namespace HiveServer.Controllers
             field.MarkedDeleted = newField.markedDeleted;
             field.ParcelNumber = newField.parcelNumber;
             field.Longitude = newField.longitude;
-            field.Lattitude = newField.lattitude; 
+            field.Lattitude = newField.latitude; 
             field.UpdatedOn = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
@@ -137,8 +137,8 @@ namespace HiveServer.Controllers
         {
             var userId = long.Parse(User.Identity.GetUserId());
 
-            var field = await db.Fields.Where(f => f.Id == id).Include(f => f.Org).Include(f => f.Org.Bonds).FirstOrDefaultAsync();
-            var organisation = field?.Org;
+            var field = await db.Fields.Where(f => f.Id == id).Include(f => f.OnOrganisation).Include(f => f.OnOrganisation.Bonds).FirstOrDefaultAsync();
+            var organisation = field?.OnOrganisation;
             var staff = organisation?.Bonds;
 
             if (field == null)

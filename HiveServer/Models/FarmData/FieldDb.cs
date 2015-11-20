@@ -17,7 +17,7 @@ namespace HiveServer.Models.FarmData
 
         public string ParcelNumber { get; set; }
 
-        public virtual OrganisationDb Org { get; set;}
+        public virtual OrganisationDb OnOrganisation { get; set;}
 
         public long onOrganisationID { get; set; }
 

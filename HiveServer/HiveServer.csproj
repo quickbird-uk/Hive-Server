@@ -194,6 +194,10 @@
     <Compile Include="Migrations\201511191943239_RenamedAlmostEverything.Designer.cs">
       <DependentUpon>201511191943239_RenamedAlmostEverything.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201511201922020_Fixed Organisation.cs" />
+    <Compile Include="Migrations\201511201922020_Fixed Organisation.Designer.cs">
+      <DependentUpon>201511201922020_Fixed Organisation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Base\SMSService.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -342,6 +346,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201511191943239_RenamedAlmostEverything.resx">
       <DependentUpon>201511191943239_RenamedAlmostEverything.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201511201922020_Fixed Organisation.resx">
+      <DependentUpon>201511201922020_Fixed Organisation.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

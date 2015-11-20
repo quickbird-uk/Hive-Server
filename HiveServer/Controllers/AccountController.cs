@@ -88,7 +88,9 @@ namespace HiveServer.Controllers
                     lastName = thisUser.LastName,
                     firstName = thisUser.FirstName,
                     phone = thisUser.PhoneNumber,
-                    id = thisUser.Id
+                    id = thisUser.Id,
+                    markedDeleted = thisUser.MarkedDeleted,
+                    version = thisUser.Version
                 };
 
                 return Ok(uView);

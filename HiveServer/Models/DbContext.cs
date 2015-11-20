@@ -62,7 +62,7 @@ namespace HiveServer.Models
 
 
             //configure Fields
-            modelBuilder.Entity<OrganisationDb>().HasMany(p => p.Fields).WithRequired(f => f.Org);
+            modelBuilder.Entity<OrganisationDb>().HasMany(p => p.Fields).WithRequired(f => f.OnOrganisation);
             modelBuilder.Entity<OrganisationDb>().ToTable("Organisations");
 
             modelBuilder.Entity<FieldDb>().ToTable("Fields");

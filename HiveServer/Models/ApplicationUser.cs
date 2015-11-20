@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using HiveServer.Models.FarmData;
+using System.ComponentModel.DataAnnotations;
 
 namespace HiveServer.Models
 {
@@ -35,6 +36,13 @@ namespace HiveServer.Models
         public string LastName { get; set; }
 
         public byte[] OTPSecret { get; set; }
+
+        /// <summary> Version of the item in question, this is used for concurrency </summary>
+        [Timestamp]
+        public byte[] Version { get; set; }
+
+        /// <summary> marks Entity As deleted </summary>
+        public bool MarkedDeleted { get; set; }
 
         /// <summary>
         /// The list of organisations the person is related to
@@ -62,6 +70,8 @@ namespace HiveServer.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+
 
     }
 
