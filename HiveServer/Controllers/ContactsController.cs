@@ -110,6 +110,7 @@ namespace HiveServer.Controllers
             if (contact.state == ContactDb.StatePendingP1 && contactWeb.state == ContactDb.StateFriend)
             { contactDb.State = ContactDb.StateFriend;
                 message = "has accepted your friend request!";
+                contactDb.UpdatedOn = DateTime.UtcNow;
             }
 
             //when you can block the person
@@ -121,14 +122,15 @@ namespace HiveServer.Controllers
                 else
                 { contactDb.State = ContactDb.StateBlockedP1; }
                 message = "has blocked you!";
+                contactDb.UpdatedOn = DateTime.UtcNow; 
             }
             else 
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.IllegalChanges); }
 
             await db.SaveChangesAsync();
 
-            var parties = await db.Users.Where(p => p.Id == id || p.Id == UserId).ToArrayAsync();
-            long phone = parties.First(p => p.Id == id).PhoneNumber;
+            var parties = await db.Users.Where(p => p.Id == contactDb.Person1Id || p.Id == contactDb.Person2Id).ToArrayAsync();
+            long phone = parties.First(p => p.Id != UserId).PhoneNumber;
             string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
             string SmsMesage = "QHive: " + actorName + " " + message;
             SMSService.SendMessage(phone.ToString(), SmsMesage); //We don;t want to await an SMS, really 
@@ -162,8 +164,8 @@ namespace HiveServer.Controllers
             db.Contacts.Remove(contactDb);
             await db.SaveChangesAsync();
 
-            var parties = await db.Users.Where(p => p.Id == id || p.Id == UserId).ToArrayAsync();
-            long phone = parties.First(p => p.Id == id).PhoneNumber;
+            var parties = await db.Users.Where(p => p.Id == contactDb.Person1Id || p.Id == contactDb.Person2Id).ToArrayAsync();
+            long phone = parties.First(p => p.Id != UserId).PhoneNumber;
             string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
             string SmsMesage = "QHive: " + actorName + " has deleted you!";
             SMSService.SendMessage(phone.ToString(), SmsMesage); //We don;t want to await an SMS, really 

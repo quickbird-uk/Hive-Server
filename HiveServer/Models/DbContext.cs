@@ -49,7 +49,7 @@ namespace HiveServer.Models
             modelBuilder.Entity<BondDb>().ToTable("Bindings");
             modelBuilder.Entity<BondDb>().Property(p => p.CreatedOn).IsRequired();
             modelBuilder.Entity<BondDb>().Property(p => p.Role).IsRequired();
-            modelBuilder.Entity<BondDb>().Property(p => p.Role).HasMaxLength(4);
+            modelBuilder.Entity<BondDb>().Property(p => p.Role).HasMaxLength(10);
 
 
 

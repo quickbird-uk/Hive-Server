@@ -14,11 +14,11 @@ namespace HiveServer.Migrations
                         Id = c.Long(nullable: false, identity: true),
                         PersonID = c.Long(nullable: false),
                         OrganisationID = c.Long(nullable: false),
-                        Role = c.String(nullable: false, maxLength: 4),
-                        CreatedAt = c.DateTimeOffset(nullable: false, precision: 7),
-                        UpdatedAt = c.DateTimeOffset(precision: 7),
+                        Role = c.String(nullable: false, maxLength: 10),
+                        CreatedOn = c.DateTimeOffset(nullable: false, precision: 7),
+                        UpdatedOn = c.DateTimeOffset(precision: 7),
                         Version = c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"),
-                        Deleted = c.Boolean(nullable: false),
+                        MarkedDeleted = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Organisations", t => t.OrganisationID, cascadeDelete: true)
@@ -33,10 +33,10 @@ namespace HiveServer.Migrations
                         Id = c.Long(nullable: false, identity: true),
                         Name = c.String(),
                         Description = c.String(),
-                        CreatedAt = c.DateTimeOffset(precision: 7),
-                        UpdatedAt = c.DateTimeOffset(precision: 7),
+                        CreatedOn = c.DateTimeOffset(precision: 7),
+                        UpdatedOn = c.DateTimeOffset(precision: 7),
                         Version = c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"),
-                        Deleted = c.Boolean(nullable: false),
+                        MarkedDeleted = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -46,49 +46,49 @@ namespace HiveServer.Migrations
                     {
                         Id = c.Long(nullable: false, identity: true),
                         Name = c.String(),
-                        size = c.Double(nullable: false),
+                        AreaInHectares = c.Double(nullable: false),
                         FieldDescription = c.String(),
                         ParcelNumber = c.String(),
-                        OnOrgId = c.Long(nullable: false),
-                        CreatedAt = c.DateTimeOffset(precision: 7),
-                        UpdatedAt = c.DateTimeOffset(precision: 7),
+                        onOrganisationID = c.Long(nullable: false),
+                        Lattitude = c.Double(nullable: false),
+                        Longitude = c.Double(nullable: false),
+                        CreatedOn = c.DateTimeOffset(precision: 7),
+                        UpdatedOn = c.DateTimeOffset(precision: 7),
                         Version = c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"),
-                        Deleted = c.Boolean(nullable: false),
-                        Org_Id = c.Long(nullable: false),
+                        MarkedDeleted = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Organisations", t => t.Org_Id, cascadeDelete: true)
-                .Index(t => t.Org_Id);
+                .ForeignKey("dbo.Organisations", t => t.onOrganisationID, cascadeDelete: true)
+                .Index(t => t.onOrganisationID);
             
             CreateTable(
                 "dbo.Tasks",
                 c => new
                     {
                         Id = c.Long(nullable: false, identity: true),
-                        name = c.String(nullable: false),
-                        jobDescription = c.String(),
-                        type = c.String(nullable: false),
-                        onFieldId = c.Long(nullable: false),
-                        assignedById = c.Long(nullable: false),
-                        assignedToId = c.Long(nullable: false),
+                        Name = c.String(nullable: false),
+                        TaskDescription = c.String(),
+                        Type = c.String(nullable: false),
+                        ForFieldID = c.Long(nullable: false),
+                        AssignedByID = c.Long(nullable: false),
+                        AssignedToID = c.Long(nullable: false),
                         DueDate = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         DateFinished = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
-                        state = c.String(nullable: false),
+                        State = c.String(nullable: false),
                         EventLog = c.String(),
-                        rate = c.Double(nullable: false),
-                        timeSpent = c.Time(nullable: false, precision: 7),
-                        CreatedAt = c.DateTimeOffset(precision: 7),
-                        UpdatedAt = c.DateTimeOffset(precision: 7),
+                        PayRate = c.Double(nullable: false),
+                        CreatedOn = c.DateTimeOffset(precision: 7),
+                        UpdatedOn = c.DateTimeOffset(precision: 7),
                         Version = c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"),
-                        Deleted = c.Boolean(nullable: false),
+                        MarkedDeleted = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.People", t => t.assignedById)
-                .ForeignKey("dbo.People", t => t.assignedToId)
-                .ForeignKey("dbo.Fields", t => t.onFieldId)
-                .Index(t => t.onFieldId)
-                .Index(t => t.assignedById)
-                .Index(t => t.assignedToId);
+                .ForeignKey("dbo.People", t => t.AssignedByID)
+                .ForeignKey("dbo.People", t => t.AssignedToID)
+                .ForeignKey("dbo.Fields", t => t.ForFieldID)
+                .Index(t => t.ForFieldID)
+                .Index(t => t.AssignedByID)
+                .Index(t => t.AssignedToID);
             
             CreateTable(
                 "dbo.People",
@@ -99,6 +99,8 @@ namespace HiveServer.Migrations
                         FirstName = c.String(nullable: false, maxLength: 100),
                         LastName = c.String(nullable: false, maxLength: 100),
                         OTPSecret = c.Binary(nullable: false, maxLength: 256),
+                        Version = c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"),
+                        MarkedDeleted = c.Boolean(nullable: false),
                         Email = c.String(maxLength: 256),
                         EmailConfirmed = c.Boolean(nullable: false),
                         PasswordHash = c.String(),
@@ -160,10 +162,10 @@ namespace HiveServer.Migrations
                         Person1Id = c.Long(nullable: false),
                         Person2Id = c.Long(nullable: false),
                         State = c.String(maxLength: 2, fixedLength: true),
-                        CreatedAt = c.DateTimeOffset(precision: 7),
-                        UpdatedAt = c.DateTimeOffset(precision: 7),
+                        CreatedOn = c.DateTimeOffset(precision: 7),
+                        UpdatedOn = c.DateTimeOffset(precision: 7),
                         Version = c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"),
-                        Deleted = c.Boolean(nullable: false),
+                        MarkedDeleted = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.People", t => t.Person1Id)
@@ -188,10 +190,10 @@ namespace HiveServer.Migrations
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.Contacts", "Person2Id", "dbo.People");
             DropForeignKey("dbo.Contacts", "Person1Id", "dbo.People");
-            DropForeignKey("dbo.Fields", "Org_Id", "dbo.Organisations");
-            DropForeignKey("dbo.Tasks", "onFieldId", "dbo.Fields");
-            DropForeignKey("dbo.Tasks", "assignedToId", "dbo.People");
-            DropForeignKey("dbo.Tasks", "assignedById", "dbo.People");
+            DropForeignKey("dbo.Fields", "onOrganisationID", "dbo.Organisations");
+            DropForeignKey("dbo.Tasks", "ForFieldID", "dbo.Fields");
+            DropForeignKey("dbo.Tasks", "AssignedToID", "dbo.People");
+            DropForeignKey("dbo.Tasks", "AssignedByID", "dbo.People");
             DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.People");
             DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.People");
             DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.People");
@@ -206,10 +208,10 @@ namespace HiveServer.Migrations
             DropIndex("dbo.AspNetUserClaims", new[] { "UserId" });
             DropIndex("dbo.People", "UserNameIndex");
             DropIndex("dbo.People", new[] { "PhoneNumber" });
-            DropIndex("dbo.Tasks", new[] { "assignedToId" });
-            DropIndex("dbo.Tasks", new[] { "assignedById" });
-            DropIndex("dbo.Tasks", new[] { "onFieldId" });
-            DropIndex("dbo.Fields", new[] { "Org_Id" });
+            DropIndex("dbo.Tasks", new[] { "AssignedToID" });
+            DropIndex("dbo.Tasks", new[] { "AssignedByID" });
+            DropIndex("dbo.Tasks", new[] { "ForFieldID" });
+            DropIndex("dbo.Fields", new[] { "onOrganisationID" });
             DropIndex("dbo.Bindings", new[] { "OrganisationID" });
             DropIndex("dbo.Bindings", new[] { "PersonID" });
             DropTable("dbo.AspNetRoles");

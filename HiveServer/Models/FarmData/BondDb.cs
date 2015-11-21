@@ -38,9 +38,9 @@ namespace HiveServer.Models.FarmData
         /// <summary> Explains the relationship between the person and the Organisation. THere are Mangers, Agronomists and Crew. ALl have different privilages.  </summary>
         public string Role { get; set; }
 
-        public const string RoleOwner = "Own";
-        public const string RoleManager = "Man";
-        public const string RoleSpecialist = "Spec";
+        public const string RoleOwner = "Owner";
+        public const string RoleManager = "Manager";
+        public const string RoleSpecialist = "Specialist";
         public const string RoleCrew = "Crew";
         public const string RoleAny = "Any";
         public const string RoleNone = "NA";

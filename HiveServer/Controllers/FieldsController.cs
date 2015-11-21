@@ -70,6 +70,7 @@ namespace HiveServer.Controllers
                 onOrganisationID = newField.onOrganisationID,
                 OnOrganisation = bond.Organisation,
                 Name = newField.name,
+                AreaInHectares = newField.areaInHectares,
                 FieldDescription = newField.fieldDescription,
                 Lattitude = newField.latitude,
                 Longitude = newField.longitude,
@@ -120,7 +121,8 @@ namespace HiveServer.Controllers
             field.MarkedDeleted = newField.markedDeleted;
             field.ParcelNumber = newField.parcelNumber;
             field.Longitude = newField.longitude;
-            field.Lattitude = newField.latitude; 
+            field.Lattitude = newField.latitude;
+            field.AreaInHectares = newField.areaInHectares;
             field.UpdatedOn = DateTime.UtcNow;
 
             await db.SaveChangesAsync();

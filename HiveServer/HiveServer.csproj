@@ -182,23 +182,6 @@
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="DTO\Account\SMSRequest.cs" />
     <Compile Include="DTO\TaskEvent.cs" />
-    <Compile Include="Migrations\201510091610134_Initial.cs" />
-    <Compile Include="Migrations\201510091610134_Initial.Designer.cs">
-      <DependentUpon>201510091610134_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201510091617361_CHengedFieldId.cs" />
-    <Compile Include="Migrations\201510091617361_CHengedFieldId.Designer.cs">
-      <DependentUpon>201510091617361_CHengedFieldId.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201511191943239_RenamedAlmostEverything.cs" />
-    <Compile Include="Migrations\201511191943239_RenamedAlmostEverything.Designer.cs">
-      <DependentUpon>201511191943239_RenamedAlmostEverything.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201511201922020_Fixed Organisation.cs" />
-    <Compile Include="Migrations\201511201922020_Fixed Organisation.Designer.cs">
-      <DependentUpon>201511201922020_Fixed Organisation.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Base\SMSService.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -252,6 +235,11 @@
     </Compile>
     <Compile Include="DTO\Account\AccountBindingModels.cs" />
     <Compile Include="DTO\Account\AccountViewModels.cs" />
+    <Compile Include="Migrations\201511210014330_Initial.cs" />
+    <Compile Include="Migrations\201511210014330_Initial.Designer.cs">
+      <DependentUpon>201511210014330_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DbContext.cs" />
     <Compile Include="DTO\_Entity.cs" />
     <Compile Include="Models\ContactDb.cs" />
@@ -338,17 +326,8 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201510091610134_Initial.resx">
-      <DependentUpon>201510091610134_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201510091617361_CHengedFieldId.resx">
-      <DependentUpon>201510091617361_CHengedFieldId.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201511191943239_RenamedAlmostEverything.resx">
-      <DependentUpon>201511191943239_RenamedAlmostEverything.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201511201922020_Fixed Organisation.resx">
-      <DependentUpon>201511201922020_Fixed Organisation.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201511210014330_Initial.resx">
+      <DependentUpon>201511210014330_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
