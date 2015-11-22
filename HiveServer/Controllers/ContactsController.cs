@@ -135,7 +135,7 @@ namespace HiveServer.Controllers
             string SmsMesage = "Hive: " + actorName + " " + message;
             SMSService.SendMessage(phone.ToString(), SmsMesage); //We don;t want to await an SMS, really 
 
-            return Ok();
+            return Ok(contactDb.ToContact(UserId));
         }
 
  

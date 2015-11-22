@@ -93,15 +93,15 @@ namespace HiveServer.Controllers
             if (!responce.IsSuccessStatusCode)
                 return responce;
 
-            var orgBonds = await GetThisBondAnOrg(UserId, id, db);
+            var orgBond = await GetThisBondAnOrg(UserId, id, db);
 
-            if (orgBonds == null)
+            if (orgBond == null)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.DoesntExist); }
 
-            if (orgBonds.Role != Models.FarmData.BondDb.RoleOwner)
+            if (orgBond.Role != Models.FarmData.BondDb.RoleOwner)
             { return Request.CreateResponse(HttpStatusCode.BadRequest, ErrorResponse.CantEdit); }
 
-            var orgDb = orgBonds.Organisation; 
+            var orgDb = orgBond.Organisation; 
             orgDb.Name = newOrganisation.name;
             orgDb.Description = newOrganisation.orgDescription;
             orgDb.Version = newOrganisation.version;
@@ -110,7 +110,7 @@ namespace HiveServer.Controllers
             
 
             await db.SaveChangesAsync();
-            return Ok();
+            return Ok((Organisation) orgBond);
         }
 
 

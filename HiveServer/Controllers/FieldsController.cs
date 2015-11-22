@@ -127,7 +127,7 @@ namespace HiveServer.Controllers
 
             await db.SaveChangesAsync();
 
-            return Ok(); 
+            return Ok((Field)field); 
         }
 
 

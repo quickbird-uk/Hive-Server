@@ -148,7 +148,7 @@ namespace HiveServer.Controllers
             selectedBond.Role = changedStaff.role;
 
             await db.SaveChangesAsync();
-            return Ok();
+            return Ok((Staff)selectedBond);
         }
 
 

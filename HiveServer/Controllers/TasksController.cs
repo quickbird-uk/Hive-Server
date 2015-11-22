@@ -231,12 +231,14 @@ namespace HiveServer.Controllers
 
                 
                 eventLog.Add(new TaskEvent((DTO.TaskDTO)oldTask, UserId));
-
                 oldTask.EventLog = JsonConvert.SerializeObject(eventLog);
+                if (newTask.state == TaskDb.StateFinished)
+                    oldTask.DateFinished = DateTimeOffset.UtcNow; 
+
                 await db.SaveChangesAsync();
             }
 
-            return Ok(); 
+            return Ok((TaskDTO)oldTask); 
         }
 
      
