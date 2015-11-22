@@ -17,36 +17,38 @@ namespace HiveServer.DTO
         {
             Title = title;
             Timestamp = DateTime.UtcNow;
-            ChangedBy = userId;
+            changedPersonID = userId;
 
-            Rate = job.payRate;
-            AssignedTo = job.assignedToID;
-            Type = job.type;
-            Name = job.name;
-            JobDescription = job.taskDescription;
-            Deleted = job.markedDeleted;
+            rate = job.payRate;
+            assignedToID = job.assignedToID;
+            type = job.type;
+            name = job.name;
+            taskDescription = job.taskDescription;
+            deleted = job.markedDeleted;
+            timeTaken = job.timeTaken;
         }
 
         public string Title { get; set; }
 
 
         /// <summary> Id the the person that made these changes </summary>
-        public long ChangedBy { get; set; }
+        public long changedPersonID { get; set; }
 
-        public double Rate { get; set; }
+        public double rate { get; set; }
 
-        public long AssignedTo { get; set; }
+        public long assignedToID { get; set; }
 
-        public string Type { get; set; }
+        public string type { get; set; }
 
-        public string Name { get; set; }
+        public string name { get; set; }
 
-        public string JobDescription { get; set; }
+        public string taskDescription { get; set; }
 
-        public bool Deleted { get; set; }
+        public bool deleted { get; set; }
 
-        public TimeSpan TimeSpent { get; set; }
-        public DateTime Timestamp { get; set; }
+        public long timeTaken { get; set; }
+
+        public DateTimeOffset Timestamp { get; set; }
 
 
     }

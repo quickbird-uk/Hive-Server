@@ -152,6 +152,16 @@ namespace HiveServer.Controllers
                 db.Tasks.Add(job);
                 await db.SaveChangesAsync();
 
+                //If it makes sence, send a mesage
+                if (newJob.assignedToID != UserId && newJob.state != TaskDb.StateFinished)
+                {
+                    var parties = await db.Users.Where(p => p.Id == newJob.assignedToID || p.Id == UserId).ToArrayAsync();
+                    long phone = parties.First(p => p.Id == newJob.assignedToID).PhoneNumber;
+                    string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
+                    string message = "Hive: " + String.Format("{0} has assigned you a {1} task at the {2} field. For more details, see Tasks in the Hive app on your phone", actorName, newJob.type, theField.Name);
+                    SMSService.SendMessage(phone.ToString(), message); //We don;t want to await an SMS, really 
+                }
+
                 return Ok((DTO.TaskDTO)job);
             }
             else

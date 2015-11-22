@@ -24,11 +24,11 @@ namespace HiveServer.Models
         public long Id { get; set; }
 
         /// <summary> Spesifies when it was created for the first time </summary>
-        public DateTimeOffset? CreatedOn { get; set; }
+        public DateTimeOffset CreatedOn { get; set; }
 
 
         /// <summary> Spesifies when this entity was updated for the last time </summary>
-        public DateTimeOffset? UpdatedOn { get; set; }
+        public DateTimeOffset UpdatedOn { get; set; }
 
         /// <summary> Version of the item in question, this is used for concurrency </summary>
         [Timestamp]

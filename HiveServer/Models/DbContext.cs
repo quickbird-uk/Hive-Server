@@ -75,9 +75,6 @@ namespace HiveServer.Models
             modelBuilder.Entity<TaskDb>().Property(j => j.Name).IsRequired();
             modelBuilder.Entity<TaskDb>().Property(j => j.State).IsRequired(); // .IsFixedLength().HasMaxLength(3)
             modelBuilder.Entity<TaskDb>().Property(j => j.Type).IsRequired();
-            modelBuilder.Entity<TaskDb>().Property(j => j.DateFinished).HasColumnType("datetime2");
-            modelBuilder.Entity<TaskDb>().Property(j => j.DueDate).HasColumnType("datetime2");
-
 
         }
 

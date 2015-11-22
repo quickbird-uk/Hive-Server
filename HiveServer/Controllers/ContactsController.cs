@@ -75,7 +75,7 @@ namespace HiveServer.Controllers
             var parties = await db.Users.Where(p => p.Id == contactID || p.Id == UserId).ToArrayAsync();
             long phone = parties.First(p => p.Id == contactID).PhoneNumber; 
             string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
-            string message = "QHive: " + String.Format("{0} has sent you a friend request!", actorName);
+            string message = "Hive: " + String.Format("{0} has sent you a friend request!", actorName);
             SMSService.SendMessage(phone.ToString(), message); //We don;t want to await an SMS, really 
 
             return Ok(newContact.ToContact(UserId)); 
@@ -132,7 +132,7 @@ namespace HiveServer.Controllers
             var parties = await db.Users.Where(p => p.Id == contactDb.Person1Id || p.Id == contactDb.Person2Id).ToArrayAsync();
             long phone = parties.First(p => p.Id != UserId).PhoneNumber;
             string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
-            string SmsMesage = "QHive: " + actorName + " " + message;
+            string SmsMesage = "Hive: " + actorName + " " + message;
             SMSService.SendMessage(phone.ToString(), SmsMesage); //We don;t want to await an SMS, really 
 
             return Ok();
@@ -167,7 +167,7 @@ namespace HiveServer.Controllers
             var parties = await db.Users.Where(p => p.Id == contactDb.Person1Id || p.Id == contactDb.Person2Id).ToArrayAsync();
             long phone = parties.First(p => p.Id != UserId).PhoneNumber;
             string actorName = parties.First(p => p.Id == UserId).FirstName + " " + parties.First(p => p.Id == UserId).LastName;
-            string SmsMesage = "QHive: " + actorName + " has deleted you!";
+            string SmsMesage = "Hive: " + actorName + " has deleted you!";
             SMSService.SendMessage(phone.ToString(), SmsMesage); //We don;t want to await an SMS, really 
 
             return Ok(); 

@@ -104,7 +104,7 @@ namespace HiveServer.Controllers
 
             var organisation = await db.Organisations.FirstOrDefaultAsync(f => f.Id == newStaff.onOrganisationID);
             string organisationName = organisation.Name;
-            string message = String.Format("You have been assigned as {0} on {1} by {2}. Congratulations! If {2} gives you unwanted assignment, you may remove {2} from your contacts ", staffDB.Role, organisationName, inviterName);
+            string message = String.Format("Hive: You have been assigned as {0} on {1} by {2}. Congratulations! If {2} gives you unwanted assignment, you may remove {2} from your contacts ", staffDB.Role, organisationName, inviterName);
 
             await SMSService.SendMessage(invitee.PhoneNumber.ToString(), message);
 

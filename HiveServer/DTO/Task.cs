@@ -21,9 +21,9 @@ namespace HiveServer.DTO
 
         public virtual long assignedToID { get; set; }
 
-        public DateTime completedOnDate { get; set; }
+        public DateTimeOffset completedOnDate { get; set; }
 
-        public DateTime dueDate { get; set; }
+        public DateTimeOffset dueDate { get; set; }
 
         public virtual List<TaskEvent> eventLog { get; set; }
 

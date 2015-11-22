@@ -35,9 +35,9 @@ namespace HiveServer.Models
         public virtual ApplicationUser AssignedTo { get; set; }
         public virtual long AssignedToID { get; set; }
 
-        public DateTime DueDate { get; set; }
+        public DateTimeOffset DueDate { get; set; }
 
-        public DateTime DateFinished { get; set; }
+        public DateTimeOffset DateFinished { get; set; }
 
         public string State { get; set; }
 

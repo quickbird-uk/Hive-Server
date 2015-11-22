@@ -239,6 +239,10 @@
     <Compile Include="Migrations\201511210014330_Initial.Designer.cs">
       <DependentUpon>201511210014330_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201511220024359_EditedDatatime.cs" />
+    <Compile Include="Migrations\201511220024359_EditedDatatime.Designer.cs">
+      <DependentUpon>201511220024359_EditedDatatime.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DbContext.cs" />
     <Compile Include="DTO\_Entity.cs" />
@@ -328,6 +332,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201511210014330_Initial.resx">
       <DependentUpon>201511210014330_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201511220024359_EditedDatatime.resx">
+      <DependentUpon>201511220024359_EditedDatatime.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
